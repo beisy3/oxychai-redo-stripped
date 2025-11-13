@@ -97,11 +97,11 @@ class FaceCovering(models.Model):
         return self.type
 
 class Calendar(models.Model):
-    the_date = models.DateField(unique=True)
+    the_date = models.DateField(unique=True, db_index=True)
     day_name = models.CharField(max_length=10)
-    hebrew_date = models.CharField(default=None, blank=True, null=True, max_length=30)
-    holiday_name = models.CharField(blank=True, default='empty', max_length=64)
-    holiday_type = models.CharField(max_length=64, default='empty', blank=True)
+    hebrew_date = models.CharField(default='', blank=True, max_length=30)
+    holiday_name = models.CharField(blank=True, default='', max_length=64)
+    holiday_type = models.CharField(max_length=64, default='', blank=True)
     open_staus = models.BooleanField(default=True)
      
     def __str__(self):
@@ -151,7 +151,7 @@ class Appointment(models.Model):
     dateID = models.ForeignKey(Calendar, on_delete=models.PROTECT)
     patientID = models.ForeignKey(patient, on_delete=models.CASCADE)
     sessionTime = models.ForeignKey(Time, on_delete=models.PROTECT)
-    panelPosition = models.CharField(max_length=10, null=True)
+    panelPosition = models.CharField(max_length=10, blank=True, default='')
     appointmentStatus = models.CharField(
         max_length=4,
         #choices=APPOINTMENT_STATUS_OPTIONS,
