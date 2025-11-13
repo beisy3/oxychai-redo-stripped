@@ -420,6 +420,7 @@ class PersonalInfo():
                 'age': p.age,
                 'carer': p.carer,
                 'req_sess': p.req_sess,
+                'maintenance_status': p.maintenance_status,
                 'phone': p.phone_number,
                 'email': p.email_address,
                 'cost':  cost,
@@ -479,6 +480,7 @@ class PersonalInfo():
                 'age': p.age,
                 'carer': p.carer,
                 'req_sess': p.req_sess,
+                'maintenance': p.maintenance_status,
                 'phone': p.phone_number,
                 'email': p.email_address,
                 'cost':  cost,
@@ -494,7 +496,7 @@ class PersonalInfo():
             traceback.print_exc()
             raise MyException('error')
 
-    def register(first_name, last_name, gender, age, req_sessions, phone, email, cost, depth, size, mask, pipe_length, carer, note, extras):
+    def register(first_name, last_name, gender, age, req_sessions, maintenance, phone, email, cost, depth, size, mask, pipe_length, carer, note, extras):
         try:
             print('-->', mask)
             new_patient = patient(
@@ -503,6 +505,7 @@ class PersonalInfo():
                 gender = gender if gender else None,
                 age = age if age else None,
                 req_sess = req_sessions if req_sessions else None,
+                maintenance_status = maintenance if maintenance else False,
                 phone_number = phone if phone else None,
                 email_address = email if email else None,
                 cost_pennys = cost if cost else Price.objects.first().price,
@@ -524,7 +527,7 @@ class PersonalInfo():
             traceback.print_exc()
             raise MyException('error')
         
-    def edit_info(id, first_name, last_name, gender, age, req_sessions, phone, email, cost, depth, size, mask, pipe_length, carer, note, extras):
+    def edit_info(id, first_name, last_name, gender, age, req_sessions, maintenance, phone, email, cost, depth, size, mask, pipe_length, carer, note, extras):
         try:
             p = patient.objects.get(personID = id)
             p.first_name = first_name
@@ -532,6 +535,7 @@ class PersonalInfo():
             p.gender = gender if gender else None
             p.age = age if age else None
             p.req_sess = req_sessions if req_sessions else None
+            p.maintenance_status = maintenance if maintenance else False
             p.phone_number = phone if phone else None
             p.email_address = email if email else None
             p.cost_pennys = cost if cost else Price.objects.first().price

@@ -415,6 +415,7 @@ def RegisterNew(request):
             gender = form['gender']
             age = form['age']
             req_sessions = form['req_sessions']
+            maintenance = form['maintenance']
             email = form['email']
             phone = form['phone']
             cost = form['cost']
@@ -425,7 +426,7 @@ def RegisterNew(request):
             note = form['note']
             carer = form['carer']
             extras = form['extras']
-            registration = PersonalInfo.register(first_name, last_name, gender, age, req_sessions, phone, email, cost, depth, size, mask, pipe_length, carer, note, extras)
+            registration = PersonalInfo.register(first_name, last_name, gender, age, req_sessions, maintenance, phone, email, cost, depth, size, mask, pipe_length, carer, note, extras)
             if not registration:
                 return HttpResponse('failed', status=400)
             return HttpResponse('success')
@@ -498,6 +499,7 @@ def editDetails(request):
             gender = form['gender']
             age = form['age']
             req_sessions = form['req_sessions']
+            maintenance = form['maintenance']
             email = form['email']
             phone = form['phone']
             cost = form['cost']
@@ -508,7 +510,7 @@ def editDetails(request):
             note = form['note']
             carer = form['carer']
             extras = form['extras']
-            edit = PersonalInfo.edit_info(id, first_name, last_name, gender, age, req_sessions, phone, email, cost, depth, size, mask, pipe_length, carer, note, extras)
+            edit = PersonalInfo.edit_info(id, first_name, last_name, gender, age, req_sessions,  maintenance, phone, email, cost, depth, size, mask, pipe_length, carer, note, extras)
             if not edit:
                 return HttpResponse('failed', status=400)
             return HttpResponse('success')

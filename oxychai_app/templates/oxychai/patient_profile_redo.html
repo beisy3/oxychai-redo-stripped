@@ -61,6 +61,11 @@
                     <div class="flex justify-between gap-4 bg-gray-50old bg-white px-5 py-3.5"><div>Age:</div><div>{{ patient_info.age }}</div></div>
                     <div class="flex justify-between gap-4 bg-gray-50old bg-white px-5 py-3.5"><div>Carer:</div><div>{% if patient_info.carer %}Yes{% else %}No{% endif %}</div></div>
                     <div class="flex justify-between gap-4 bg-gray-50old bg-white px-5 py-3.5"><div>Required Sessions:</div><div>{{ patient_info.req_sess }}</div></div>
+                    {% if patient_info.maintenance %}
+                    <div class="flex justify-between gap-4 bg-gray-50old bg-white px-5 py-3.5"><div>Maintenance:</div><div>Yes</div></div>
+                    {% else %}
+                    <div class="flex justify-between gap-4 bg-gray-50old bg-white px-5 py-3.5"><div>Maintenance:</div><div>No</div></div>
+                    {% endif %}
                     <div class="flex justify-between gap-4 bg-gray-50old bg-white px-5 py-3.5"><div>Phone:</div><div>{{ patient_info.phone }}</div></div>
                     <div class="flex justify-between gap-4 bg-gray-50old bg-white px-5 py-3.5"><div>Email:</div><div class="break-all">{{ patient_info.email }}</div></div>
                     <div class="flex justify-between gap-4 bg-gray-50old bg-white px-5 py-3.5"><div>Cost:</div><div>£{{ patient_info.cost }}</div></div>

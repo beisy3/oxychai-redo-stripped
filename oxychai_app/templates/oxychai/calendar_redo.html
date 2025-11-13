@@ -1490,8 +1490,13 @@
                     status_title.innerHTML = `Change appointment status:`
                     status_title.setAttribute('class', `mb-3`)
                     const change_status = Render.change_app_status(data['status'], data)
+                    const info_re_status = document.createElement('div')
+                    info_re_status.setAttribute('class', 'text-gray-700 text-base pl-1 pr-5 py-px')
+                    info_re_status.setAttribute('id', 'info_re_status')
+                    info_re_status.innerHTML = 'The patient will only be charged if you set the status to Attended or Missed.'
                     status_container.appendChild(status_title)
                     status_container.appendChild(change_status)
+                    status_container.appendChild(info_re_status)
                     return status_container
                 },
                 hidden_info : function(data){

@@ -74,6 +74,7 @@ class patient(models.Model):
     gender = models.CharField(max_length=10, blank=True, null=True)
     age = models.IntegerField(null=True, blank=True)
     req_sess = models.IntegerField(null=True, blank=True)
+    maintenance_status = models.BooleanField(default=False)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     email_address = models.EmailField(blank=True, null=True)
     mask = models.ForeignKey(Masks, on_delete=models.PROTECT, blank=True, null=True)

@@ -75,6 +75,43 @@
                 //submit
                 document.getElementById('register').setAttribute('class', `${Styles.textSemi} ${Styles.textColor} ${Styles.buttonCorner} pt-[10px] pb-[10px] w-full ${oxyBlue}`);
                 
+                //make sure only req sessions or maintenance is selected
+                const req_sessions = document.getElementById('sessions');
+                const maintenance = document.getElementById('maintenance');
+                const maintenance_label = document.getElementById('maintenance_label');
+                if(req_sessions.value){
+                    maintenance.disabled = true;
+                    maintenance_label.classList.add('opacity-50');
+                }
+                else if(maintenance.checked){
+                    req_sessions.disabled = true;
+                    req_sessions.classList.add('opacity-50');
+                }
+                //check new changes
+                req_sessions.addEventListener('input', () => {
+                    if(req_sessions.value){
+                        maintenance.checked = false;
+                        maintenance_label.classList.add('opacity-50');
+                        maintenance.disabled = true;
+                    }
+                    else{
+                        maintenance.disabled = false;
+                        maintenance_label.classList.remove('opacity-50');
+                    }
+                });
+
+                maintenance.addEventListener('input', () => {
+                    if(maintenance.checked){
+                        req_sessions.disabled = true;
+                        req_sessions.value = '';
+                        req_sessions.classList.add('opacity-50');
+                    }
+                    else{
+                        req_sessions.disabled = false;
+                        req_sessions.classList.remove('opacity-50');
+                    }
+                });
+
                 function s_response(message){
                     document.getElementById("server_response").innerHTML = message;
                     document.getElementById("server_response").classList.remove('hidden');
@@ -172,6 +209,13 @@
                         req_sessions = null
                     }
 
+                    let maintenance
+                    if(document.getElementById("maintenance").checked){
+                        maintenance = true;
+                    } else {
+                        maintenance = null;
+                    }
+
                     let email
                     if(document.getElementById("email").value){
                         email = document.getElementById("email").value;
@@ -266,6 +310,7 @@
                         'gender':gender,
                         'age':age,
                         'req_sessions':req_sessions,
+                        'maintenance':maintenance,
                         'email':email,
                         'phone':phone,
                         'cost':cost,
@@ -519,6 +564,14 @@
             <div class="mb-8">
                 <div class="mb-3 text_semi">Required Sessions</div>
                 <input type="number" id="sessions" class="input" value="{{ details.req_sess }}" autocomplete="do-not-autofill" placeholder="1"/>
+                <div class="mt-3">
+                    {% if details.maintenance_status %}
+                    <input type="checkbox" class="peer" id="maintenance" checked>
+                    {% else %}
+                    <input type="checkbox" class="peer" id="maintenance">
+                    {% endif %}
+                    <label id="maintenance_label" for="maintenance" class="">This person will be having maintenance sessions.</label>
+                </div>
             </div>
             <div class="mb-8">
                 <div class="mb-3 text_semi">Email</div>
