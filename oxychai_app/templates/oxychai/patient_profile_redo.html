@@ -1,5 +1,5 @@
 {% extends "oxychai/layout.html" %}
-
+{% block title %}{{ patient_info.first_name }} {{ patient_info.last_name }}'s Profile{% endblock %}
 {% block head %}
         <title>{{ patient_info.first_name }} {{ patient_info.last_name }} Profile</title>
         <script>
@@ -42,7 +42,6 @@
             })
 
         </script>
-        {% block title %}{{ patient_info.first_name }} {{ patient_info.last_name }}'s Profile{% endblock %}
 {% endblock %}
     {% block content %}
                 <a href="/searchPatients"><div id="back_button" back_to="" class="flex bg-gray-50old bg-white mt-px py-5 pl-4 gap-2">
