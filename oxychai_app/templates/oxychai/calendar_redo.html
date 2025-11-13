@@ -1826,6 +1826,12 @@
                             other_ppl_div.id = 'other_ppl_div'
                             const layout_div = document.createElement('div')
                             layout_div.id = 'layout_div'
+                            if(data.length === 0){
+                                const no_booked = document.createElement('div')
+                                no_booked.innerHTML = 'Add patients to appointment to see them here'
+                                no_booked.setAttribute('class', `${Styles.emptyPageMessage}`)
+                                booked_in_div.appendChild(no_booked)
+                            }
                             for(let i = 0; i < data.length; i++){
                                 const div = document.createElement('div')
                                 const view_div = document.createElement('div')
@@ -1876,6 +1882,15 @@
                         if(this.readyState == 4 && this.status == 200) {
                             const data = JSON.parse(this.responseText)
                             const payment_page_container = document.getElementById('payments_div')
+                            if(data.length === 0){
+                                payment_page_container.innerHTML = 
+                                `
+                                <div class="${Styles.emptyPageMessage}">
+                                    When you add patients to appointment, you can register payments here.
+                                </div>
+                                `
+                                return
+                            }  
                             payment_page_container.innerHTML = ''
                             for(let i = 0; i < data.length; i++){
                                 const ind_patient_payment = document.createElement('div')
@@ -1892,6 +1907,7 @@
                                     <div class="save_payment2 ${Styles.buttonPadding} ${Styles.buttonCorner} text-center ${oxyBlue}" person_id="${data[i]['patient_id']}">Save Payment</div>
                                 </div>
                                 `
+                                payment_page_container.classList.add('bg-gray-50')
                                 payment_page_container.appendChild(ind_patient_payment)
                             }
                             Finances.make_save_payment_clickable2()
@@ -2108,7 +2124,7 @@
             <div id="scheduled_view" class="hidden"></div>
             <div id="scheduled_view" class="pt-8 pb-6 text-center text-large hidden">People In Appointment</div>
             <div id="booked_in_div" class="section mx-6 pb-7 grid gap-8 hidden"></div>
-            <div id="payments_div" class="section hidden grid gap-10 bg-[#EBF6F7]old bg-gray-50"></div>
+            <div id="payments_div" class="section hidden grid gap-10 bg-[#EBF6F7]old"></div>
             <div id="panel_div" class="section hidden grid gap-10 bg-[#EBF6F7]old bg-gray-50"></div>  
             <div id="book_in_view" class="section hidden my-px bg-[#EBF6F7]old bg-gray-50">
                 <!--<div class="pt-8 pb-6 text-center text-large">Book People In</div>-->
