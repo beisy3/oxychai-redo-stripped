@@ -1,0 +1,104 @@
+{% extends "oxychai/layout.html" %}
+
+
+{% block head %}
+<script>
+    window.addEventListener('DOMContentLoaded', ()=>{
+        const page = document.getElementById('inner_page')
+        console.log('loading patients')
+        const xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState === 4 && this.status === 200) {
+                const patients = JSON.parse(this.responseText)
+                //letter tracking
+                let letter_tracker = patients[0].last_name.charAt(0).toUpperCase()
+                function letter_div(letter){
+                    const div = document.createElement('div')
+                    const letter_div = document.createElement('div')
+                    letter_div.innerHTML = letter
+                    letter_div.setAttribute('class', 'sticky top-0 bg-gray-100 px-3.5 py-3 text-gray-900 font-bold')
+                    div.setAttribute('class', 'letter_large bg-gray-100 my-px grid gap-2')
+                    div.appendChild(letter_div)
+                    return div
+                }
+                let letter_display = letter_div(letter_tracker)
+                page.appendChild(letter_display)
+                //run through all patients
+                patients.forEach(pat => {
+                    //check if new letter
+                    if(pat.last_name.charAt(0).toUpperCase() !== letter_tracker){
+                        letter_tracker = pat.last_name.charAt(0).toUpperCase()
+                        letter_display = letter_div(letter_tracker)
+                        page.appendChild(letter_display)
+                    }
+                    const container = document.createElement('div')
+                    container.setAttribute('class', 'person_div px-7 h-16 flex items-center bg-gray-50old bg-white justify-between')
+                    container.innerHTML = `
+                    <div class="text-gray-900 font-semibold person add_person_name">${pat.first_name} ${pat.last_name}</div>
+                    <div class="flex items-center gap-6">
+                        <a href="/editDetails/?id=${pat.id}">Edit</a>
+                        <a class='py-[12px] px-2 rounded-sm bg-[#5BCBD6]' href="/patientProfile/?id=${pat.id}">Profile</a>
+                    </div>
+                    `
+                    letter_display.appendChild(container)
+                });
+                make_searchable()
+            }
+            //else if()
+        }
+        xhttp.open("GET", "/allPatients/");
+        xhttp.send();
+        function make_searchable(){
+            const names = document.querySelectorAll('.add_person_name')
+            console.log(names)
+            const input_field = document.getElementById('search_bar')
+            input_field.addEventListener('input', () =>{
+                let user_input = document.getElementById('search_bar').value.toUpperCase()    
+                for(let i = 0; i < names.length; i++){
+                    const name = names[i].innerHTML.toUpperCase()
+                    if(name.indexOf(user_input) === -1){
+                        names[i].parentElement.classList.add('hidden');
+                    }
+                    else{
+                        names[i].parentElement.classList.remove('hidden');
+                        const fl_last_name = name.split(' ')[1][0];
+                    }
+                }
+                const large_letters = document.querySelectorAll('.letter_large')
+                large_letters.forEach((letter) => {
+                    const name_children = letter.querySelectorAll('.person_div')
+                    console.log(name_children)
+                    let any_visible = false
+                    name_children.forEach((child) => {
+                        if(!child.classList.contains('hidden')){
+                            any_visible = true
+                        }
+                    })
+                    if(any_visible){
+                        letter.classList.remove('hidden')
+                    }
+                    else{
+                        letter.classList.add('hidden')
+                    }
+                })
+            })
+        }
+
+    })
+</script>
+{% endblock %}
+{% block content %}
+<div class="bg-gray-400 py-px">
+    <div class="flex bg-gray-50old bg-white">
+        <div class="p-[10px]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 96 96" fill="none">
+                <path d="M61.7815 61.7448L90.25 90.25M71.4167 38.4583C71.4167 56.6608 56.6608 71.4167 38.4583 71.4167C20.256 71.4167 5.5 56.6608 5.5 38.4583C5.5 20.256 20.256 5.5 38.4583 5.5C56.6608 5.5 71.4167 20.256 71.4167 38.4583Z" stroke="#5BCBD6" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <input id="search_bar" placeholder="Search patients by name..." class="pt-[10px] pb-[10px] w-full focus:outline-none ${Styles.textNormal} ${Styles.textColor}"/>
+    </div>
+    <div class="bg-gray-400 h-px"></div>
+    <div id="inner_page" class="bg-gray-100 grid gap-2">
+    </div>
+</div>
+{% endblock %}

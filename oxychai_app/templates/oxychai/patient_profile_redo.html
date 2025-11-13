@@ -1,0 +1,256 @@
+{% extends "oxychai/layout.html" %}
+
+{% block head %}
+        <title>{{ patient_info.first_name }} {{ patient_info.last_name }} Profile</title>
+        <script>
+            window.addEventListener('DOMContentLoaded', ()=> {
+                const Styles = {
+                        buttonCorner: 'rounded-md',
+                        textNormal: 'text-xl font-normal',
+                        textSemi: 'text-xl font-semibold',
+                        textColor: 'text-zinc-900',
+                        textBold: 'text-xl font-bold',
+                        textTitle: 'text-3xl font-bold',
+                        textTitleSmall: 'text-5xl font-semibold',
+                        selectCorner: 'rounded-md',
+                    }
+
+                const titles = document.querySelectorAll('.title')
+                titles.forEach((title) => {
+                    title.setAttribute('class', `${Styles.textTitle} mt-14 mb-8 sticky top-0 py-2 pl-1 bg-gray-50old bg-white z-50`)
+                })
+                const sub_titles = document.querySelectorAll('.sub-title')
+                const calculated_height_title = titles[0].offsetHeight
+                sub_titles.forEach((sub_title) => {
+                    sub_title.setAttribute('class', `${Styles.textTitleSmall} bg-gray-50old bg-white pl-6 mt-14 py-6 sticky top-[52px] z-20`)
+                })
+
+                const info_details_grids = document.querySelectorAll('.info-details-grid')
+                info_details_grids.forEach((grid) => {
+                    grid.setAttribute('class', 'info-details-grid grid gap-1 px-2.5')   
+                })
+                const payment_details_grids = document.querySelectorAll('.payment-details-grid')
+                console.log(payment_details_grids)
+                payment_details_grids.forEach((grid) => {
+                    grid.setAttribute('class', 'payment-details-grid grid gap-10 px-2.5')   
+                })
+
+                const date_time_overlays = document.querySelectorAll('.date-time-overlay') 
+                date_time_overlays.forEach((overlay) => {
+                    overlay.setAttribute('class', `date-time-overlay flex justify-between px-7.5 shadow-sm shadow-gray-200/30 mb-9 py-1.5 bg-gray-50old bg-white/70 backdrop-blur-xs sticky top-[148px]`)
+                })
+            })
+
+        </script>
+{% endblock %}
+    <!--<body data-theme="light" class="bg-gray-700">
+        {% csrf_token %}
+        <div class="w-[320px] m-auto bg-gray-50 text-zinc-900 text-xl">
+            <div class="w-full flex justify-between items-center pt-4 pb-4 pr-2 pl-2 bg-stone-700">
+                <div>
+                    <img src='/static/oxychai-logo-no-bg.png' alt="oxychai logo" width="80">
+                </div>
+                <div class="text-zinc-100 flex gap-2 text-xs">
+                    <a href="/">Calendar</a>
+                    <a href="/registerNew">Register</a>
+                    <a href="/searchPatients">Search</a>
+                    <a>SignIn</a>
+                </div>
+            </div>-->
+    {% block content %}
+                <a href="/searchPatients"><div id="back_button" back_to="" class="flex bg-gray-50old bg-white mt-px py-5 pl-4 gap-2">
+                <div class="flex justify-center items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-no-shrink" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                    </svg>
+                </div>
+                <span id="visible_text" class="font-semibold">Back to search patients</span>
+            </div></a>
+        <div class="bg-gray-400 py-px">
+            <div class="bg-gray-50">
+                <div class="text-3xl font-bold mb-8 sticky top-0 py-2 pl-1 bg-gray-50old bg-white z-50">Information</div>
+                <div class="grid gap-4">
+                    <div class="flex justify-between gap-4 bg-gray-50old bg-white px-5 py-3.5"><div>Name:</div><div class="text-right">{{ patient_info.first_name }} {{ patient_info.last_name }}</div></div>
+                    <div class="flex justify-between gap-4 bg-gray-50old bg-white px-5 py-3.5"><div>Gender:</div><div>{{ patient_info.gender }}</div></div>
+                    <div class="flex justify-between gap-4 bg-gray-50old bg-white px-5 py-3.5"><div>Age:</div><div>{{ patient_info.age }}</div></div>
+                    <div class="flex justify-between gap-4 bg-gray-50old bg-white px-5 py-3.5"><div>Carer:</div><div>{% if patient_info.carer %}Yes{% else %}No{% endif %}</div></div>
+                    <div class="flex justify-between gap-4 bg-gray-50old bg-white px-5 py-3.5"><div>Required Sessions:</div><div>{{ patient_info.req_sess }}</div></div>
+                    <div class="flex justify-between gap-4 bg-gray-50old bg-white px-5 py-3.5"><div>Phone:</div><div>{{ patient_info.phone }}</div></div>
+                    <div class="flex justify-between gap-4 bg-gray-50old bg-white px-5 py-3.5"><div>Email:</div><div class="break-all">{{ patient_info.email }}</div></div>
+                    <div class="flex justify-between gap-4 bg-gray-50old bg-white px-5 py-3.5"><div>Cost:</div><div>£{{ patient_info.cost }}</div></div>
+                    <div class="flex justify-between gap-4 bg-gray-50old bg-white px-5 py-3.5"><div>Note:</div><div class="text-right">{{ patient_info.note }}</div></div>
+                    <div class="flex justify-between gap-4 bg-gray-50old bg-white px-5 py-3.5"><div>Depth:</div><div>{{ patient_info.depth }}</div></div>
+                    <div class="flex justify-between gap-4 bg-gray-50old bg-white px-5 py-3.5"><div>Mask:</div><div>{{ patient_info.mask }}</div></div>
+                    <div class="flex justify-between gap-4 bg-gray-50old bg-white px-5 py-3.5"><div>Mask size:</div><div>{{ patient_info.size }}</div></div>
+                    <div class="flex justify-between gap-4 bg-gray-50old bg-white px-5 py-3.5"><div>Pipe length:</div><div>{{ patient_info.pipe_length }}</div></div>
+                    <div class="flex justify-between gap-4 bg-gray-50old bg-white px-5 py-3.5"><div>Extras:</div><div class="text-right">{{ patient_info.extras }}</div></div>
+                </div>
+                <div class="title">Appointments</div>
+                <div class="relative bg-gray-50">
+                    <div class="sub-title">Scheduled</div>
+                    <div class="date-time-overlay">
+                        <div>Date</div>
+                        <div>Time</div>
+                    </div>
+                    {% if not appointments.scheduled %}
+                        <div class="info-details-grid">
+                            <div class="text-center italic text-zinc-500">
+                                <div>No scheduled appointments</div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="info-details-grid">
+                        {% for app in appointments.scheduled %}
+                            <div class="flex px-5 py-3.5 justify-between shadow-xs/20 shadow-gray-200 bg-gray-50old bg-white">
+                                <div>{{ app.dateID.the_date }}</div>
+                                <div>{{ app.sessionTime.time }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="relative bg-gray-50">
+                    <div class="sub-title">Canceled</div>
+                    <div class="date-time-overlay">
+                        <div>Date</div>
+                        <div>Time</div>
+                    </div>
+                    {% if not appointments.canceled %}
+                        <div class="info-details-grid">
+                            <div class="text-center italic text-zinc-500">
+                                <div>No canceled appointments</div>
+                            </div>
+                        </div>
+                    {% else %}
+                    <div class="info-details-grid">
+                        {% for app in appointments.canceled %}
+                        <div>
+                            <div class="flex px-5 py-3.5 justify-between shadow-xs/20 shadow-gray-200 bg-gray-50old bg-white">
+                                <div>{{ app.dateID.the_date }}</div>
+                                <div>{{ app.sessionTime.time }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="relative bg-gray-50">
+                    <div class="sub-title">Attended</div>
+                    <div class="date-time-overlay">
+                        <div>Date</div>
+                        <div>Time</div>
+                    </div>
+                    {% if not appointments.attended %}
+                        <div class="info-details-grid">
+                            <div class="text-center italic text-zinc-500">
+                                <div>No attended appointments</div>
+                            </div>
+                        </div>
+                    {% else %}
+                    <div class="info-details-grid">
+                        {% for app in appointments.attended %}
+                            <div class="flex px-5 py-3.5 justify-between shadow-xs/20 shadow-gray-200 bg-gray-50old bg-white">
+                                <div>{{ app.dateID.the_date }}</div>
+                                <div>{{ app.sessionTime.time }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="relative bg-gray-50">
+                    <div class="sub-title">Missed</div>
+                    <div class="date-time-overlay">
+                        <div>Date</div>
+                        <div>Time</div>
+                    </div>
+                    {% if not appointments.missed %}
+                        <div class="info-details-grid">
+                            <div class="text-center italic text-zinc-500">
+                                <div>No missed appointments</div>
+                            </div>
+                        </div>
+                    {% else %}
+                    <div class="info-details-grid">
+                        {% for app in appointments.missed %}
+                            <div class="flex px-5 py-3.5 justify-between shadow-xs/20 shadow-gray-200 bg-gray-50old bg-white">
+                                <div>{{ app.dateID.the_date }}</div>
+                                <div>{{ app.sessionTime.time }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="relative bg-gray-50">
+                    <div id="unwell" class="sub-title">Unwell</div>
+                    <div class="date-time-overlay">
+                        <div>Date</div>
+                        <div>Time</div>
+                    </div>
+                    {% if not appointments.unwell %}
+                        <div class="info-details-grid">
+                            <div class="text-center italic text-zinc-500">
+                                <div>No unwell appointments</div>
+                            </div>
+                        </div>
+                    {% else %}
+                    <div class="info-details-grid">
+                        {% for app in appointments.unwell %}
+                            <div class="flex px-5 py-3.5 justify-between shadow-xs/20 shadow-gray-200 bg-gray-50old bg-white">
+                                <div>{{ app.dateID.the_date }}</div>
+                                <div>{{ app.sessionTime.time }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="relative">
+                <div class="title" id="balance">
+                    <div class="flex justify-between">
+                        <div>Balance</div><div>£{{ financial_info.total }}</div>
+                    </div>
+                </div>
+                <div class="sub-title">Payments</div>
+                <div class="date-time-overlay">
+                    <div>Date</div>
+                    <div>Time</div>
+                </div>
+                <div class="payment-details-grid">
+                    {% if not financial_info.payments %}
+                        <div class="info-details-grid">
+                            <div class="text-center italic text-zinc-500">
+                                <div>No payments made</div>
+                            </div>
+                        </div>
+                    {% else %}
+                        {% for payment in financial_info.payments %}
+                        <div class="px-5 py-3.5 grid gap-3 shadow-xs/20 shadow-gray-200 bg-gray-50old bg-white">
+                            <div class="flex justify-between"><div>{{ payment.date }}</div><div>{{ payment.time }}</div></div>
+                            <div class="text-4xl">£{{ payment.amount }}</div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="sub-title">Debts</div>
+                <div class="date-time-overlay">
+                    <div>Date</div>
+                    <div>Time</div>
+                </div>
+                <div class="payment-details-grid">
+                    {% if not financial_info.debt %}
+                        <div class="info-details-grid">
+                            <div class="text-center italic text-zinc-500">
+                                <div>No debts created</div>
+                            </div>
+                        </div>
+                    {% else %}
+                        {% for deb in financial_info.debt %}
+                        <div class="px-5 py-3.5 grid gap-3 shadow-xs/20 shadow-gray-200 bg-gray-50old bg-white">
+                            <div class="flex justify-between"><div>{{ deb.date }}</div><div>{{ deb.time }}</div></div>
+                            <div class="text-4xl">£{{ deb.amount }}</div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                </div>
+            </div>
+        </div>
+    {% endblock %}

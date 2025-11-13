@@ -1,0 +1,77 @@
+{% extends "oxychai/layout.html" %}
+
+{% block head %}
+<script>
+    window.addEventListener('DOMContentLoaded', ()=>{
+        const add_image_button = document.getElementById('add_image_button')
+        add_image_button.setAttribute('class', `bg-amber-500 ${Styles.buttonCorner} pt-[10px] pb-[10px] px-10  text-center`)
+        const save_layout_button = document.getElementById('upload_save')
+        save_layout_button.setAttribute('class', `${oxyBlue} ${Styles.buttonCorner} pt-[10px] pb-[10px] px-10 text-center`)
+
+        const imgInp = document.getElementById('layoutFile');
+        const preview = document.getElementById('preview')
+        imgInp.onchange = evt => {
+        const [file] = imgInp.files
+            if (file) {
+                preview.src = URL.createObjectURL(file)
+                preview.classList.remove('hidden')
+                document.getElementById('pre_upload').classList.add('hidden')
+                document.getElementById('post_upload').classList.remove('hidden')
+            }
+        }
+
+        save_layout_button.addEventListener('click', () => {
+            console.log('sending layout')
+            const file_input = document.getElementById('layoutFile')
+            const formData = new FormData()
+            formData.append('layout_image', file_input.files[0])
+            console.log(formData, file_input.files[0])
+            const csrf = document.getElementsByName("csrfmiddlewaretoken")[0]?.value
+            const xhttp = new XMLHttpRequest()
+            xhttp.onreadystatechange = async function() {
+                if(this.readyState == 4 && this.status == 200) {
+                    const message = document.getElementById('layout_message')
+                    message.innerHTML = this.responseText
+                    message.classList.remove('hidden')
+                    //refresh all layouts
+                    await delay(5000);
+                    file_input.value = ''
+                    preview.classList.add('hidden')
+                    document.getElementById('pre_upload').classList.remove('hidden')
+                }
+                else if(this.readyState == 4 && this.status !== 200){
+                    const message = document.getElementById('layout_message')
+                    message.innerHTML = this.responseText
+                    message.classList.remove('hidden')
+                    Run.clear_image_upload()
+                    //do not need to display pop up error as server response shown
+                }
+            }
+            xhttp.open('POST', `${window.location.origin}/saveLayout/`)
+            xhttp.setRequestHeader('X-CSRFToken', csrf)
+            xhttp.send(formData)
+        })
+    })
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50old bg-gray-400 py-px">
+    <div class="bg-white min-h-screen px-4 py-16">
+        <div id="layout_message" class="hidden my-3 text-center font-semibold"></div>
+        <div class="border-1 border-gray-500 bg-gray-200 rounded-sm border-dashed p-4 min-h-60 min-w-32 flex justify-center items-center">
+            <div id="pre_upload" class="text-gray-600 italic">Images you upload will appear here</div>`
+            <img class="hidden" id="preview" src="#" alt="preview image">
+        </div>
+        <div class="flex justify-center mt-8">
+            <input class="hidden" type="file" id="layoutFile" name="layout_image">
+            <label for="layoutFile" id="add_image_button">Add image from device</label>
+        </div>
+        <div class="flex justify-center mt-8">
+            <div id="upload_save">Upload to system</div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

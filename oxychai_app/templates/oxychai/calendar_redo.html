@@ -1,0 +1,2148 @@
+{% extends "oxychai/layout.html" %}
+
+{% block head %}
+    <script>
+        window.addEventListener('DOMContentLoaded', ()=>{
+                    /*        const Styles = {
+                        buttonCorner: 'rounded-md',
+                        
+                        
+                        textColor: 'text-gray-900',
+                        textBold: 'text-xl font-bold',
+                        textTitle: 'text-3xl font-bold',
+                        textTitleSmall: 'text-5xl font-semibold',
+                        selectCorner: 'rounded-md',
+                    }*/
+            /*const Styles = {
+                buttonCorner: 'rounded-sm',
+                //textNormal: 'text-xs font-normal',
+                textNormal: 'text-xl font-normal',
+                //textSemi: 'text-xs font-semibold',
+                textSemi: 'text-xl font-semibold',
+                textColor: 'text-gray-900',
+                textWarning: 'text-red-500',
+                textBold: 'text-xl font-bold',
+                //textBold: 'text-xs font-bold',
+                textTitle: 'text-3xl font-bold',
+                textTitleSmall: 'text-base font-semibold',
+                selectCorner: 'rounded-md',
+                HierArchOne: 'text-3xl font-extrabold',
+                HierArchTwo: 'text-2xl font-semibold',
+                HierArchThree: 'text-xl font-medium',
+                //HierArchThree: 'text-xs font-medium',
+            }*/
+            const Page = {
+                Layer1: 'bg-stone-600',
+                Layer2: 'bg-stone-500',
+                Layer3: 'bg-stone-300'
+            }
+            /*const oxyBlue = 'bg-[#5BCBD6]'
+            const oxySecondry = 'bg-[#70C4D761]'
+            const oxyTertiary = 'bg-[#70C4D733]'
+            const oxyColorOutline = 'outline-[#5BCBD6]'
+            const textOxy = 'text-[#70C4D7]'*/
+            const input_classes = `${Styles.textNormal} ${Styles.textColor} w-full pt-[12px] pb-[12px] pl-3.5 border border-gray-300 bg-gray-200 border-2 rounded-md onfocus:outline ${oxyColorOutline} outline-offset-4`
+            const OxyInput = function (width, placeholder, id){
+                const input = document.createElement('input')
+                input.setAttribute('class', `${Styles.textNormal} ${Styles.textColor} w-full pt-[10px] pb-[10px] pl-2 bg-white border border-gray-700 border-2 rounded-md onfocus:outline ${oxyColorOutline}`)
+                input.setAttribute('id', id)
+                input.setAttribute('placeholder', placeholder)
+                return input
+            }
+            const OxyButton = function(text, extra_classes){
+                const button = document.createElement('div')
+                button.setAttribute('class', `${Styles.textNormal} ${Styles.textColor} ${Styles.buttonCorner} pt-[10px] pb-[10px] ${extra_classes}`)
+                button.innerHTML = text
+                return button
+            }
+            //run warning styling rendering
+            const warnings = document.querySelectorAll('.warning')
+            warnings.forEach((warn) => {
+                const old_classes = warn.getAttribute('class')
+                warn.setAttribute('class', `${old_classes} ${Styles.textWarning} ${Styles.textSemi}`)
+            })
+            const buttons = document.querySelectorAll('.button')
+            buttons.forEach((btn) => {
+                const old_classes = btn.getAttribute('class')
+                btn.setAttribute('class', `${Styles.textNormal} ${Styles.textColor} ${Styles.buttonCorner} ${oxyBlue} pt-[10px] pb-[10px] ${old_classes} w-full text-center`)
+            })
+            const csrf = document.getElementsByName("csrfmiddlewaretoken")[0]?.value
+            const page = document.getElementById('page')
+            /*const menu = document.getElementById('menu')
+            const menu_options = document.getElementById('slide_out_menu')
+            menu_options.setAttribute('class', 'bg-gray-200 grid absolute -translate-x-[420px] top-[88px] pt-2 z-20 w-[404px]')
+            const old_classes = 'bg-gray-200 grid absolute top-[88px] pt-2 z-20 w-[404px]'
+            menu.addEventListener('click', ()=>{
+                if(!menu_options.classList.contains('-translate-x-4')){
+                    const menu_options = document.getElementById('slide_out_menu')
+                    menu_options.setAttribute('class', `${old_classes} transition duration-600 -translate-x-4`)
+                }
+                else{
+                    menu_options.setAttribute('class', `${old_classes} transition duration-600 -translate-x-[420px]`)
+                }
+            })*/
+            //make back button clickable
+            const back = document.getElementById('back_button')
+            back.addEventListener('click', ()=>{
+                const previous_page = back.getAttribute('back_to')
+                const calendar = document.getElementById('calendar_page')
+                const times = document.getElementById('session_times')
+                const appointment_menu = document.getElementById('appointment_options')
+                const final_sections = document.querySelectorAll('.section')
+                const appointment = document.getElementById('booked_in_div')
+                const payment_page = document.getElementById('payment_page_html')
+                if(previous_page == 'calendar'){
+                    times.classList.add('hidden')
+                    calendar.classList.remove('hidden')
+                    back.classList.add('hidden')
+                }
+                else if(previous_page == 'session_time_display'){
+                    appointment_menu.classList.add('hidden')
+                    times.classList.remove('hidden')
+                    Render.back_to_button('calendar', 'Back to calendar')
+                }
+                else if(previous_page == 'appointment_menu'){
+                    appointment_menu.classList.remove('hidden')
+                    final_sections.forEach((section) => {
+                        if(!section.classList.contains('hidden')){
+                            section.classList.add('hidden')
+                        }
+                    })
+                    Render.back_to_button('session_time_display', 'Back to session times')
+                }
+                else if(previous_page == 'appointment'){
+                    appointment.classList.remove('hidden')
+                    payment_page.classList.add('hidden')
+                    Render.back_to_button('appointment_menu', 'Back to appointment menu')
+                }
+            })
+
+            const Components ={
+                booked_in_patient_div: function(name, id){
+                    const div = document.createElement('div')
+                    div.innerHTML = `<div class="px-7 h-16 flex items-center bg-[#F4F9FA]old bg-white justify-between">
+                                        <div class="add_person_name font-semibold">${name}</div>
+                                        <div class="py-[12px] w-24 text-center rounded-sm bg-gray-200">Added</div>
+                                    </div>`
+                    div.setAttribute('class', 'patient_option w-full h-fit')
+                    div.setAttribute('value', id)
+                    return div
+                },
+                horizontal_line: function(width){
+                    const line = document.createElement('div')
+                    line.setAttribute('class', `${width} h-px bg-gray-400`)
+                    return line
+                },
+                status: function(status_code){
+                    let status = status_code
+                    if(status === 'ATTE'){
+                        status = 'Attended'
+                    }
+                    else if(status === 'SCHE'){
+                        status = 'Scheduled'
+                    }
+                    else if(status === 'MISS'){
+                        status = 'Missed'
+                    }
+                    else if(status === 'UNWE'){
+                        status = 'Unwell'
+                    }
+                    let status_display = `<div id="status_display">${status}</div>`
+                    return status_display
+                },
+                balance_span: function(balance){
+                    const span = document.createElement('span')
+                    span.setAttribute('id', 'balance-amount')
+                    span.innerHTML = `${balance}`
+                    if(balance >= 0){
+                        span.setAttribute('class', 'text-green-600')
+                    }
+                    else{
+                        span.setAttribute('class', 'text-red-600')
+                    }
+                    return span
+                },
+                balance_span2: function(balance, person_id){
+                    const span = document.createElement('span')
+                    span.setAttribute('class', 'balance-amount2')
+                    span.setAttribute('person_id', person_id)
+                    span.innerHTML = `${balance}`
+                    if(balance >= 0){
+                        span.classList.add('text-green-600')
+                    }
+                    else{
+                        span.classList.add('text-red-600')
+                    }
+                    return span
+                },
+                select: function(empty, options){
+                    const select = document.createElement('select')
+                    function option(value, text){
+                        const option = document.createElement('option')
+                        option.setAttribute('value', value)
+                        option.innerHTML = text
+                        return option
+                    }
+                    const em = option('', empty)
+                    select.appendChild(em)
+                    options.forEach(opt => {
+                        const op = option(opt.value, opt.text)
+                        select.appendChild(op)
+                    })
+                    return select
+                }
+
+            }
+            const MakeClickable = {
+                link_to_payment: function(button){
+                    const payment_page_to_link_to = document.getElementById('payment_page_html')
+                    const booked_in = document.getElementById('booked_in_div')
+                    button.addEventListener('click', () => {
+                        Render.back_to_button('appointment', 'Back to appointment')
+                        payment_page_to_link_to.classList.remove('hidden')
+                        booked_in.classList.add('hidden')
+                    })
+                },
+                expand_and_collapse_button: function(button){
+                    button.addEventListener('click', () =>{
+                        const local_hidden_info = button.parentElement.querySelector('.hide_info')
+                        if(local_hidden_info.classList.contains('hidden')){
+                            local_hidden_info.classList.remove('hidden')
+                            button.innerHTML = 'Collapse'
+                        }
+                        else{
+                            local_hidden_info.classList.add('hidden')
+                            button.innerHTML = 'Expand'
+                        }
+                    })
+                },
+                delete_layout: function(){
+                    const button = document.getElementById('delete_layout')
+                    button.addEventListener('click', () => {
+                        const layout_choose = document.getElementById('layout_all')
+                        const layout_delete = document.getElementById('layout_all_delete')
+                        if(!layout_choose.classList.contains('hidden')){
+                            layout_choose.classList.add('hidden')
+                            layout_delete.classList.remove('hidden')
+                        }
+                        else if(!layout_delete.classList.contains('hidden')){
+                            layout_delete.classList.add('hidden')
+                        }
+                        else{
+                            layout_delete.classList.remove('hidden')
+                        }
+                    })
+                },
+                images_to_delete: function(){
+                    const images = document.querySelectorAll('.layout_img_to_delete')
+                    images.forEach((img) => {
+                        img.addEventListener('click', () => {
+                            const layout_id = img.getAttribute('value')
+                            const xhttp = new XMLHttpRequest()
+                            xhttp.onreadystatechange = function() {
+                                if(this.readyState == 4 && this.status == 200) {
+                                    Run.refresh_all_layouts()
+                                }
+                                else if(this.readyState == 4 && this.status !== 200){
+                                    console.log('failed to delete layout', this.responseText)
+                                    const message = 'Failed to delete.'
+                                    Run.show_error(message)
+                                }
+                            }
+                            xhttp.open('POST', `${window.location.origin}/layoutDelete/`)
+                            xhttp.setRequestHeader('X-CSRFToken', csrf)
+                            const dict_to_send = {'layout_id': layout_id}
+                            const form_json = JSON.stringify(dict_to_send)
+                            xhttp.send(form_json)
+                        })
+                    })
+                },
+                layout_button: function(){
+                    const add_layout_button = document.getElementById('upload_layout')
+                    const save_layout_button = document.getElementById('upload_save')
+                    const file_input = document.getElementById('layoutFile')
+                    const message = document.getElementById('layout_message')
+                    file_input.addEventListener('input', () => {
+                        add_layout_button.classList.add('hidden')
+                        save_layout_button.classList.remove('hidden')
+                        message.classList.remove('hidden')
+                        message.innerHTML = '1 file uploaded, click save to confirm.'
+                    })
+                },
+                send_layout: function(){
+                    const save_layout_button = document.getElementById('upload_save')
+                    save_layout_button.addEventListener('click', () => {
+                        const file_input = document.getElementById('layoutFile')
+                        const formData = new FormData()
+                        formData.append('layout_image', file_input.files[0])
+                        const csrf = document.getElementsByName("csrfmiddlewaretoken")[0]?.value
+                        const xhttp = new XMLHttpRequest()
+                        xhttp.onreadystatechange = function() {
+                            if(this.readyState == 4 && this.status == 200) {
+                                const message = document.getElementById('layout_message')
+                                message.innerHTML = this.responseText
+                                Run.clear_image_upload()
+                                Run.switch_to_upload_image()
+                                //refresh all layouts
+                                Run.refresh_all_layouts()
+                            }
+                            else if(this.readyState == 4 && this.status !== 200){
+                                const message = document.getElementById('layout_message')
+                                message.innerHTML = this.responseText
+                                Run.clear_image_upload()
+                                Run.switch_to_upload_image()
+                                //do not need to display pop up error as server response shown
+                            }
+                        }
+                        xhttp.open('POST', `${window.location.origin}/saveLayout/`)
+                        xhttp.setRequestHeader('X-CSRFToken', csrf)
+                        xhttp.send(formData)
+                    })
+                },
+                panel_change: function(select_div){
+                    const select = select_div
+                    select.addEventListener('change', (e) => {
+                        const new_position = (e.currentTarget.value).toString()
+                        const appointment_id = e.currentTarget.parentElement.parentElement.parentElement.parentElement.parentElement.getAttribute('appointment_id')
+                        const xhttp = new XMLHttpRequest()
+                        xhttp.onreadystatechange = function() {
+                            if(this.readyState == 4 && this.status == 200) {
+                                Render.update_panel_position(appointment_id, new_position)
+                            }
+                            else if(this.readyState == 4 && this.status !== 200){
+                                //revert to previous value
+                                const message = 'Failed to set panel.'
+                                Run.show_error(message)
+                            }
+                        }
+                        xhttp.open('POST', `${window.location.origin}/changePanelPosition/`)
+                        xhttp.setRequestHeader('X-CSRFToken', csrf)
+                        const dict_to_send = {'appointment_id': appointment_id, 'position': new_position}
+                        const form_json = JSON.stringify(dict_to_send)
+                        xhttp.send(form_json)
+                    })
+                },
+                panel_change2: function(select_div){
+                    select_div.addEventListener('change', (e) => {
+                        const new_position = (e.currentTarget.value).toString()
+                        const appointment_id = e.currentTarget.getAttribute('appointment_id')
+                        const xhttp = new XMLHttpRequest()
+                        xhttp.onreadystatechange = function() {
+                            if(this.readyState == 4 && this.status == 200) {
+                                Render.update_panel_position2(appointment_id, new_position)
+                            }
+                            else if(this.readyState == 4 && this.status !== 200){
+                                //revert to previous value
+                                const message = 'Failed to set panel.'
+                                Run.show_error(message)
+                            }
+                        }
+                        xhttp.open('POST', `${window.location.origin}/changePanelPosition/`)
+                        xhttp.setRequestHeader('X-CSRFToken', csrf)
+                        const dict_to_send = {'appointment_id': appointment_id, 'position': new_position}
+                        const form_json = JSON.stringify(dict_to_send)
+                        xhttp.send(form_json)
+                    })
+                },
+                left_year_arrow: function(left_year_arrow, month, year){
+                    left_year_arrow.addEventListener('click', () => {
+                        if (year > 2025){
+                            year -= 1
+                        }
+                        get_month(month, year)
+                    })
+                },
+                right_year_arrow: function(right_year_arrow, month, year){
+                    right_year_arrow.addEventListener('click', () => {
+                        if (year < 2200){
+                            year += 1
+                        }
+                        get_month(month, year)
+                    })
+                },
+                /*save_layout : function(){
+                    //on click send to server
+                    const upload_button = document.getElementById('save_layout')
+                    upload_button.addEventListener('click', () => {
+                        image = document.getElementById('upload_new_layout').files[0]
+
+                        const xhttp = new XMLHttpRequest()
+                        xhttp.onreadystatechange = function() {
+                            if(this.readyState == 4 && this.status == 200) {
+                                const ids = upload_button.parentElement.parentElement.parentElement.parentElement
+                                const sess_id = ids.getAttribute('session_id')
+                                const day_id = ids.getAttribute('day_id')
+                                Refresh.layout(sess_id, day_id)
+                            }
+                        }
+                        xhttp.open('POST', `${window.location.origin}/UploadLayout/`)
+                        xhttp.setRequestHeader('X-CSRFToken', csrf)
+                        const formData = new FormData()
+                        formData.append('layout_image', image)
+                        xhttp.send(formData)
+                    })
+                },*/
+                back_to_calendar : function(arrow){
+                    arrow.addEventListener('click', () => {
+                        document.getElementById('calendar_page').classList.remove('hidden')
+                        document.getElementById('session_times').classList.add('hidden')
+                        document.getElementById('session_times').innerHTML = ''
+                    })
+                },
+                back_to_times : function(arrow){
+                    arrow.addEventListener('click', () => {
+                        document.getElementById('session_times').classList.remove('hidden')
+                        //!!!!!patient details old not used
+                        document.getElementById('patient_details').classList.add('hidden')
+                        document.getElementById('booked_in_div').innerHTML = ''
+                    })
+                },
+                change_app_status: function(selection, previous_status){
+                    selection.addEventListener('change', (e) => {
+                        const new_status = e.currentTarget.value
+                        const appointment_id = e.currentTarget.getAttribute('appointment_id')
+                        const patient_id = e.currentTarget.getAttribute('patient_id')
+                        const xhttp = new XMLHttpRequest()
+                        xhttp.onreadystatechange = function() {
+                            if(this.readyState == 4 && this.status == 200) {
+                                previous_status = new_status
+                                Render.update_appointment_status(appointment_id, new_status)
+                                //Finances.update_balance(patient_id)
+                            }
+                            else if(this.readyState == 4 && this.status !== 200){
+                                const message = 'Failed to update status.'
+                                Run.show_error(message)
+                                if (previous_status === null){
+                                    e.target.parentElement.firstChild.selected = true
+                                    //Finances.update_balance(patient_id)
+                                }
+                                else{
+                                    e.target.parentElement.querySelector(`option[value='${previous_status}']`).selected = true
+                                    //Finances.update_balance(patient_id)
+                                }
+                            }
+                        }
+                        xhttp.open('POST', `${window.location.origin}/changeAppStatus/`)
+                        xhttp.setRequestHeader('X-CSRFToken', csrf)
+                        const dict_to_send = {'patient_id': patient_id, 'appointment_id': appointment_id, 'new_status': new_status}
+                        const form_json = JSON.stringify(dict_to_send)
+                        xhttp.send(form_json)
+                    })
+                },
+                cancel_button : function(button){
+                    button.addEventListener('click', (e) => {
+                        const appointment_id = e.currentTarget.parentElement.parentElement.parentElement.getAttribute('appointment_id')
+                        const xhttp = new XMLHttpRequest()
+                        xhttp.onreadystatechange = function() {
+                            if(this.readyState == 4 && this.status == 200) {
+                                document.querySelector(`div[appointment_id='${appointment_id}']`).remove()
+                                //patient_details = document.getElementById('patient_details')
+                                //const sess_id = patient_details.getAttribute('session_id')
+                                //const day_id = patient_details.getAttribute('day_id')
+                                //Refresh.patients_booked(sess_id, day_id)
+                                //Refresh.add_appointment_section(sess_id, day_id)
+                            }
+                            else if(this.readyState == 4 && this.status !== 200){
+                                const message = 'Failed to cancel appointment.'
+                                Run.show_error(message)
+                            }
+                        }
+                        xhttp.open('POST', `${window.location.origin}/cancelAppointment/`)
+                        xhttp.setRequestHeader('X-CSRFToken', csrf)
+                        const appointment_json = JSON.stringify(appointment_id)
+                        xhttp.send(appointment_json)
+                    })
+                },
+                add_to_appointment : function(){
+                    add_button = document.querySelectorAll('.add_patient_button')
+                    for(let i = 0; i < add_button.length; i++){
+                        add_button[i].addEventListener('click', (e) => {
+                            const patient_id = e.currentTarget.parentElement.parentElement.getAttribute('value')
+                            day_id = document.getElementById('add_patient').getAttribute('day_id')
+                            sess_id = document.getElementById('add_patient').getAttribute('session_id')
+                            const xhttp = new XMLHttpRequest()
+                            xhttp.onreadystatechange = function() {
+                                if(this.readyState == 4 && this.status == 200) {
+                                    //Refresh.patients_booked(sess_id, day_id)
+                                    const container = document.getElementById('add_patient')
+                                    const patient_div = container.querySelector(`[value = '${patient_id}']`)
+                                    console.log(patient_div)
+                                    const name = patient_div.querySelector('.add_person_name').innerHTML
+                                    const booked_in_div = Components.booked_in_patient_div(name, patient_id)
+                                    patient_div.replaceWith(booked_in_div)
+                                }
+                                else if(this.readyState == 4 && this.status !== 200){
+                                    const message = 'Failed to add to appointment.'
+                                    Run.show_error(message)
+                                }
+                            }
+                            xhttp.open('POST', `${window.location.origin}/bookAppointmentInd/`)
+                            xhttp.setRequestHeader('X-CSRFToken', csrf)
+                            const dict_to_send = {'patient_id': patient_id, 'session_id': sess_id, 'day_id': day_id}
+                            const form_json = JSON.stringify(dict_to_send)
+                            xhttp.send(form_json)
+                        })
+                    }
+                },
+                search_names :  function(){
+                    const names = document.querySelectorAll('.add_person_name')
+                    const input_field = document.getElementById('search_bar')
+                    input_field.addEventListener('input', () =>{
+                        let user_input = document.getElementById('search_bar').value.toUpperCase()    
+                        for(let i = 0; i < names.length; i++){
+                            const name = names[i].innerHTML.toUpperCase()
+                            if(name.indexOf(user_input) === -1){
+                                names[i].parentElement.parentElement.classList.add('hidden');
+                            }
+                            else{
+                                names[i].parentElement.parentElement.classList.remove('hidden');
+                                const fl_last_name = name.split(' ')[1][0];
+                            }
+                        }
+                        const large_letters = document.querySelectorAll('.letter_large')
+                        large_letters.forEach((letter) => {
+                            const name_children = letter.querySelectorAll('.patient_option')
+                            let any_visible = false
+                            name_children.forEach((child) => {
+                                if(!child.classList.contains('hidden')){
+                                    any_visible = true
+                                }
+                            })
+                            if(any_visible){
+                                letter.classList.remove('hidden')
+                            }
+                            else{
+                                letter.classList.add('hidden')
+                            }
+                        })
+                    })
+                },
+                calendar : function() {
+                    const days = document.getElementsByClassName('day');
+                    for (let i = 0; i < days.length; i++) {
+                        days[i].addEventListener('click', (e) => {
+                            const sessions = JSON.parse(document.getElementById('session_json').innerText)
+                            document.getElementById('calendar_page').classList.add('hidden')
+                            document.getElementById('session_times').classList.remove('hidden')
+                            Render.session_times(e.currentTarget, sessions)
+                            Render.back_to_button('calendar', 'Back to calendar')
+                        });
+                    }
+                },
+                layout_options : function(){
+                    all_new_layouts = document.getElementsByClassName('select_n_layout')
+                    const sess_id = document.getElementById('patient_details').getAttribute('session_id')
+                    const day_id = document.getElementById('patient_details').getAttribute('day_id')
+                    for(let i = 0; i < all_new_layouts.length; i++){
+                        all_new_layouts[i].addEventListener('click',  function change(e) {
+                            const layout_id = e.currentTarget.getAttribute('value')
+                            fetch('/changeLayout/', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRFToken': csrf
+                                },
+                                body: JSON.stringify({'layout_id': layout_id, 'session_id': sess_id, 'day_id': day_id})
+                            })
+                            .then(function(response) {
+                                if (response.ok) {
+                                    Refresh.layout(sess_id, day_id)
+                                } else {
+                                    Run.show_error('Unable to save layout choice')
+                                }
+                            })
+                            .catch((error) => {
+                                console.error('Error:', error);
+                            });
+                        })
+                    }
+                },
+                appointment_view_selection : function(sess_id, day_id){
+                    const button_cont = document.getElementById('appointment_options')
+                    const booked_in = document.getElementById('schedule')
+                    booked_in.replaceWith(booked_in.cloneNode(true));
+                    const cloned_booked_in = document.getElementById('schedule');
+                    cloned_booked_in.addEventListener('click', () => {
+                        console.log('booked in clicked')
+                        Refresh.patients_booked(sess_id, day_id)
+                        document.getElementById('booked_in_div').classList.remove('hidden')
+                        Run.updateStyles()
+                        button_cont.classList.add('hidden')
+                        Render.back_to_button('appointment_menu', 'Back to appointment menu')
+                    })
+
+                    const add_patients = document.getElementById('add_patients')
+                    add_patients.replaceWith(add_patients.cloneNode(true));
+                    const cloned_add_patients = document.getElementById('add_patients');
+                    
+                    cloned_add_patients.addEventListener('click', () => {
+                        Refresh.add_appointment_section(sess_id, day_id)
+                        button_cont.classList.add('hidden')
+                        document.getElementById('book_in_view').classList.remove('hidden')
+                        Run.updateStyles()
+                        Render.back_to_button('appointment_menu', 'Back to appointment menu')
+                    })
+
+                    const view_layout = document.getElementById('view_layout')
+                    view_layout.replaceWith(view_layout.cloneNode(true));
+                    const cloned_view_layout = document.getElementById('view_layout');
+                    
+                    cloned_view_layout.addEventListener('click', () => {
+                        button_cont.classList.add('hidden')
+                        Refresh.todays_layout()
+                        Run.updateStyles()
+                        Render.back_to_button('appointment_menu', 'Back to appointment menu')
+                    })
+
+                    const edit_layouts = document.getElementById('edit_layouts')
+                    edit_layouts.replaceWith(edit_layouts.cloneNode(true));
+                    const cloned_edit_layouts = document.getElementById('edit_layouts');
+                    
+                    cloned_edit_layouts.addEventListener('click', () => {
+                        button_cont.classList.add('hidden')
+                        Refresh.layout(sess_id, day_id)
+                        document.getElementById('layout_view').classList.remove('hidden')
+                        Run.updateStyles()
+                        Render.back_to_button('appointment_menu', 'Back to appointment menu')
+                    })
+
+                    const take_payment = document.getElementById('payments_patient_container')
+                    take_payment.replaceWith(take_payment.cloneNode(true));
+                    const cloned_take_payment = document.getElementById('payments_patient_container');
+                    
+                    cloned_take_payment.addEventListener('click', () => {
+                        button_cont.classList.add('hidden')
+                        Refresh.payment_page(sess_id, day_id)
+                        Run.updateStyles()
+                        Render.back_to_button('appointment_menu', 'Back to appointment menu')
+                        document.getElementById('payments_div').classList.remove('hidden')
+                    })
+
+                    const change_panels = document.getElementById('panel_change')
+                    change_panels.replaceWith(change_panels.cloneNode(true));
+                    const cloned_change_panels = document.getElementById('panel_change');
+                    
+                    cloned_change_panels.addEventListener('click', () => {
+                        button_cont.classList.add('hidden')
+                        Refresh.panel_page(sess_id, day_id)
+                        Run.updateStyles()
+                        Render.back_to_button('appointment_menu', 'Back to appointment menu')
+                        document.getElementById('panel_div').classList.remove('hidden')
+                    })
+                },
+                session_select : function(){
+                    const sess_times = document.getElementsByClassName('sess_time');
+                    for (let i = 0; i < sess_times.length; i++) {
+                        sess_times[i].addEventListener('click', (e) => {
+                            const sess_id = e.currentTarget.getAttribute('value')
+                            const day_id = e.currentTarget.parentElement.getAttribute('day_id')
+                            Render.appointment_options(sess_id, day_id)
+                            MakeClickable.appointment_view_selection(sess_id, day_id)
+                            Render.back_to_button('session_time_display', 'Back to appointment times')
+                            document.getElementById('patient_details').setAttribute('day_id', day_id)
+                            document.getElementById('patient_details').setAttribute('session_id', sess_id) 
+                            document.getElementById('session_times').classList.add('hidden')
+                            //document.getElementById('patient_details').classList.remove('hidden')
+                            //Refresh.layout(sess_id, day_id)
+                            //Refresh.patients_booked(sess_id, day_id)
+                            //Refresh.add_appointment_section(sess_id, day_id)
+                            //Run.updateStyles()
+                        });
+                    }
+                },
+                left_arrow : function(arrow, month, year){
+                    arrow.addEventListener('click', () => {
+                        if (month === 1){
+                            month = 12
+                            year -= 1
+                        }
+                        else{
+                            month -= 1
+                        }
+                        get_month(month, year)
+                    })
+                },
+                right_arrow : function(arrow, month, year){
+                    arrow.addEventListener('click', () => {
+                        if (month === 12){
+                            month = 1
+                            year += 1
+                        }
+                        else{
+                            month += 1
+                        }
+                        get_month(month, year)
+                    })
+                },
+            }
+
+            const PersonInfo = {
+                accordianCreate : function(){
+                    const people_tiles = document.querySelectorAll('.visible_info')
+                    for(let i = 0; i < people_tiles.length; i++){
+                        people_tiles[i].addEventListener('click', (e) => {
+                            const clicked_element = e.currentTarget
+                            //check if selected the dropdown select
+                            if(clicked_element.tagName === 'SELECT'){
+                                return
+                            }
+                            const hidden_info = people_tiles[i].parentElement.querySelector('.hide_info')
+                            if(hidden_info.classList.contains('hidden')){
+                                hidden_info.classList.remove('hidden')
+                            }
+                            else{
+
+                                hidden_info.classList.add('hidden')
+                            }
+                        })
+                    }
+                },
+                //remove booked in ppl from the list of people in add appointment section
+                remove_booked_in_ppl : function(){
+                    const booked_in = document.querySelectorAll('.booked_in')
+                    const add_patients = document.querySelectorAll('.patient_option')
+                    //any id in booked in remove from add patients
+                    for(let i = 0; i < booked_in.length; i++){
+                        const booked_id = booked_in[i].getAttribute('person_id')
+                        for(let j = 0; j < add_patients.length; j++){
+                            const add_id = add_patients[j].getAttribute('value')
+                            if(booked_id === add_id){
+                                add_patients[j].remove()
+                            }
+                        }
+                    }
+                }
+            }
+            
+            const Finances = {
+                update_balance : function(person_id){
+                    //re-request and render patients balance
+                    const xhttp = new XMLHttpRequest()
+                    xhttp.onreadystatechange = function() {
+                        if(this.readyState == 4 && this.status == 200) {
+                            const total = JSON.parse(this.responseText)
+                            const new_amount_span = Components.balance_span(total)
+                            const balance_div = document.querySelector(`div[person_id='${person_id}'] #balance-amount`).parentElement
+                            balance_div.innerHTML = '£'
+                            balance_div.appendChild(new_amount_span)
+                        }
+                        else if(this.readyState == 4 && this.status !== 200){
+                            console.log('failed to get balance')
+                            const message = 'Failed to get current balance.'
+                            Run.show_error(message)
+                        }
+                    }
+                    xhttp.open('POST', `${window.location.origin}/getBalance/`)
+                    xhttp.setRequestHeader('X-CSRFToken', csrf)
+                    const id_json = JSON.stringify(person_id)
+                    xhttp.send(id_json)
+                },
+                update_balance2 : function(person_id){
+                    //re-request and render patients balance
+                    const xhttp = new XMLHttpRequest()
+                    xhttp.onreadystatechange = function() {
+                        if(this.readyState == 4 && this.status == 200) {
+                            const total = JSON.parse(this.responseText)
+                            const new_amount_span = Components.balance_span2(total, person_id)
+                            const balance_div = document.querySelector(`.balance-amount2[person_id='${person_id}']`)
+                            balance_div.replaceWith(new_amount_span)
+                        }
+                        else if(this.readyState == 4 && this.status !== 200){
+                            const message = 'Failed to get current balance.'
+                            Run.show_error(message)
+                        }
+                    }
+                    xhttp.open('POST', `${window.location.origin}/getBalance/`)
+                    xhttp.setRequestHeader('X-CSRFToken', csrf)
+                    const id_json = JSON.stringify(person_id)
+                    xhttp.send(id_json)
+                },
+                penny_converter : function(amount){
+                    const ammount_pennys_s = amount.replace('.', '')
+                    const ammount_pennys = parseInt(ammount_pennys_s)
+                    return ammount_pennys 
+                },
+                uniform_money_display : function(amount){
+                    if(isNaN(amount) || amount < 0 || amount === ''){
+                        return null
+                    }
+                    else if(amount.search(/\./) > 1){
+                        const decimal_index = amount.search(/\./)
+                        const pennys = amount.substring(decimal_index + 1)
+                        const pounds = amount.substring(0, decimal_index)
+                        if(pennys.length >= 2){
+                            const result = pounds + '.' + pennys.substring(0, 2)
+                            return result
+                        }
+                        else if(pennys.length === 1){
+                            const result = pounds + '.' + pennys + '0'
+                            return result
+                        }
+                        else{
+                            const result = pounds + '.00'
+                            return result
+                        }
+                    }
+                    else{
+                        return amount + '.00'
+                    }
+                },
+                live_payment_display : function(input_field, tracker){
+                    input_field.addEventListener('input', (e) => {
+                        const payment_amount = e.currentTarget.value
+                        tracker.innerHTML = Finances.uniform_money_display(payment_amount)
+                    })
+                },
+                make_save_payment_clickable : function(){
+                    const save_buttons = document.querySelectorAll('.save_payment')
+                    for(let i = 0; i < save_buttons.length; i++){
+                        save_buttons[i].addEventListener('click', (e) => {
+                            const payment_input = e.currentTarget.parentElement.parentElement.querySelector('input')
+                            const payment_amount = payment_input.value
+                            const payment_amount_u = Finances.uniform_money_display(payment_amount)
+                            const payment_ammount_p = Finances.penny_converter(payment_amount_u)
+                            const person_id = e.currentTarget.parentElement.parentElement.parentElement.parentElement.parentElement.getAttribute('person_id')
+                            const xhttp = new XMLHttpRequest()
+                            xhttp.onreadystatechange = function() {
+                                if(this.readyState == 4 && this.status == 200) {
+                                    //re-request patients balance
+                                    //clear input field and payment display
+                                    Finances.update_balance(person_id)
+                                    payment_input.value = ''
+                                    //payment_input.parentElement.parentElement.parentElement.querySelector('.live_tracker').innerHTML = ''
+                                }
+                                else if(this.readyState == 4 && this.status !== 200){
+                                    const message = 'Failed to save payment.'
+                                    Run.show_error(message)
+                                }
+                            }
+                            xhttp.open('POST', `${window.location.origin}/addPayment/`)
+                            xhttp.setRequestHeader('X-CSRFToken', csrf)
+                            const dict_to_send = {'person_id': person_id, 'amount': payment_ammount_p}
+                            const form_json = JSON.stringify(dict_to_send)
+                            xhttp.send(form_json)
+                        })
+                    }
+                },
+                make_save_payment_clickable2 : function(){
+                    const save_buttons = document.querySelectorAll('.save_payment2')
+                    for(let i = 0; i < save_buttons.length; i++){
+                        save_buttons[i].addEventListener('click', (e) => {
+                            const person_id = e.currentTarget.getAttribute('person_id')
+                            const server_response = document.querySelector(`.server_response_payments[person_id='${person_id}']`)
+                            const payment_input = e.currentTarget.parentElement.querySelector(`input[person_id='${person_id}']`)
+                            //double check right person
+                            if(!payment_input){
+                                Run.show_error('Failed to find correct input.')
+                                return
+                            }
+                            const payment_amount = payment_input.value
+                            if(!payment_amount){
+                                server_response.innerHTML = 'Please enter an amount.'
+                                server_response.classList.add('text-red-500')
+                                server_response.classList.remove('text-gray-900')
+                                return
+                            }
+                            const payment_amount_u = Finances.uniform_money_display(payment_amount)
+                            const payment_ammount_p = Finances.penny_converter(payment_amount_u)
+                            //const person_id = e.currentTarget.parentElement.parentElement.parentElement.parentElement.parentElement.getAttribute('person_id')
+                            const xhttp = new XMLHttpRequest()
+                            xhttp.onreadystatechange = function() {
+                                if(this.readyState == 4 && this.status == 200) {
+                                    //re-request patients balance
+                                    //clear input field and payment display
+                                    Finances.update_balance2(person_id)
+                                    payment_input.value = ''
+                                    server_response.innerHTML = 'Payment saved successfully.'
+                                    server_response.classList.add('text-gray-900')
+                                    server_response.classList.remove('text-red-500')
+                                    //payment_input.parentElement.parentElement.parentElement.querySelector('.live_tracker').innerHTML = ''
+                                }
+                                else if(this.readyState == 4 && this.status !== 200){
+                                    const message = 'Failed to save payment.'
+                                    Run.show_error(message)
+                                }
+                            }
+                            xhttp.open('POST', `${window.location.origin}/addPayment/`)
+                            xhttp.setRequestHeader('X-CSRFToken', csrf)
+                            const dict_to_send = {'person_id': person_id, 'amount': payment_ammount_p}
+                            const form_json = JSON.stringify(dict_to_send)
+                            xhttp.send(form_json)
+                        })
+                    }
+                },
+                generate_payment_divs: function(balance){
+                        const payments = document.createElement('div')
+                        const title = document.createElement('div')
+                        title.innerHTML = 'Payments'
+                        title.setAttribute('class', `absolute -translate-y-13 bg-[#F4F9FA]old bg-white px-1.5 -translate-x-3 ${Styles.textSemi} ${Styles.textColor}`)
+                        payments.appendChild(title)
+                        const p_divs = document.createElement('div')
+                        //inner title
+                        const inner_title = document.createElement('div')
+                        inner_title.innerHTML = 'Enter payment'
+                        const classed_inner_title = FormatClasses.hidden_inner_inner_centered_container(inner_title)
+                        //new payment
+                        const input_cont = document.createElement('div')
+                        const input_div = OxyInput('w-full', '0.00', '')
+                        input_cont.appendChild(input_div)
+                        const classed_input_cont = FormatClasses.hidden_inner_inner_centered_container(input_cont)
+                        const new_payment_display = document.createElement('div')
+                        new_payment_display.setAttribute('class', 'flex')
+                        //balance
+                        const balance_div = document.createElement('div')
+                        const balance_title = document.createElement('span')
+                        balance_title.innerHTML = `Balance:`
+                        balance_div.appendChild(balance_title)
+                        const balance_amount = document.createElement('div')
+                        const balance_span = Components.balance_span(balance)
+                        balance_amount.innerHTML = `£`
+                        balance_amount.appendChild(balance_span)
+                        balance_div.appendChild(balance_amount)
+                        balance_div.setAttribute('class', 'flex justify-between w-fit m-auto gap-1')
+                        //live tracker
+                        const currency = document.createElement('div')
+                        currency.innerHTML = '£'
+                        
+                        const payment_amount = document.createElement('div')
+                        payment_amount.setAttribute('class', 'live_tracker')
+                        
+                        new_payment_display.appendChild(currency)
+                        new_payment_display.appendChild(payment_amount)
+                        Finances.live_payment_display(input_div, payment_amount)
+                        
+                        //save button
+                        const save_cont = document.createElement('div')
+                        const save_payment = OxyButton('Save', `save_payment ${oxyBlue} w-full text-center`)
+                        save_cont.appendChild(save_payment)
+                        const classed_save_cont = FormatClasses.hidden_inner_inner_centered_container(save_cont)
+                        
+                        //live dispaly
+                        const live_div = document.createElement('div')
+                        live_div.setAttribute('class', 'flex text-gray-400')
+                        live_div.appendChild(new_payment_display)
+                        //appending section
+                        p_divs.appendChild(classed_inner_title)
+                        p_divs.appendChild(classed_input_cont)
+                        p_divs.appendChild(classed_save_cont)
+                        //p_divs.appendChild(new_payment)
+                        p_divs.appendChild(balance_div)
+                        //p_divs.appendChild(live_div)
+                        p_divs.setAttribute('class', 'grid gap-3.5')
+                        payments.appendChild(p_divs)
+                        payments.setAttribute('class', 'payments border-1 border-gray-300 rounded-md px-11 py-9')
+                        return payments
+                }
+            }
+            const FormatClasses = {
+                hidden_inner_inner_containers : function(container){
+                    container.setAttribute('class', 'flex justify-between gap-4 items-center')
+                    return container
+                },
+                hidden_inner_inner_centered_container: function(container){
+                    container.setAttribute('class', 'flex justify-center')
+                    return container
+                },
+                hidden_inner_containers : function(container){
+                    container.setAttribute('class', 'grid gap-5')
+                    return container
+                },
+                hidden_containers : function(container){
+                    const old_classes  = container.getAttribute('class')
+                    container.setAttribute('class', `${old_classes} border-1 border-gray-300 rounded-md px-4 py-4`)
+                    return container
+                },
+                hidden_container_title : function(title){
+                    title.setAttribute('class', `absolute -translate-y-8 bg-[#F4F9FA]old bg-white px-1.5 translate-x-4 ${Styles.textSemi} ${Styles.textColor}`)
+                    return title
+                }
+            };
+            const Render = {
+                letter_div: function(letter){
+                    const div = document.createElement('div')
+                    const letter_div = document.createElement('div')
+                    letter_div.innerHTML = letter
+                    letter_div.setAttribute('class', 'sticky top-0 bg-[#EBF6F7]old bg-gray-50 px-3.5 py-3 text-gray-900 font-bold')
+                    div.setAttribute('class', 'letter_large bg-[#EBF6F7]old bg-gray-50 my-px grid gap-2')
+                    div.appendChild(letter_div)
+                    return div
+                },
+                panel_page: function(data){
+                    for(let i = 0; i < data.length; i++){
+                        const container = document.getElementById('panel_div')
+                        const ind_patient_panel = document.createElement('div')
+                        ind_patient_panel.setAttribute('class', 'py-10 bg-[#F4F9FA]old bg-white px-3')
+                        let position
+                        let hidden = ''
+                        if(data[i]['position'] === ''){
+                            position = ''
+                            hidden = 'hidden'
+                        }
+                        else{
+                            position = data[i]['position']
+
+                        }
+                        const appointment_id = data[i]['id']
+                        const select = Render.panel_change_select2(appointment_id)
+                        container.appendChild(select)
+                        ind_patient_panel.innerHTML = 
+                        `
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="font-semibold text-2xl">${data[i]['name']}</div>
+                                <div class=""><span id="position_label_${data[i]['appointment_id']}" class="${hidden}">Panel </span><span class="panel_position_display" appointment_id="${data[i]['appointment_id']}">${position}</span></div>
+                            </div>
+                            <div class="server_response_panel min-h-4" person_id="${data[i]['patient_id']}"></div>
+                        `
+                        //select added
+                        ind_patient_panel.appendChild(select)
+                        container.appendChild(ind_patient_panel)
+                    }
+                },
+                payment_links: function(){
+                    const payment_link = document.createElement('div')
+                    payment_link.innerHTML = 'Take payments'
+                    payment_link.setAttribute('class', `bg-amber-500 fixed bottom-10 py-[12px] text-center ${Styles.textSemi}`)
+                    return payment_link
+                },
+                back_to_button: function(location, text){
+                    back.setAttribute('back_to', location)
+                    back.querySelector('#visible_text').innerHTML = text
+                    if(back.classList.contains('hidden')){
+                        back.classList.remove('hidden')
+                    }
+                },
+                expand_and_collapse: function(){
+                    const collapse_button = document.createElement('div')
+                    collapse_button.innerHTML = 'Expand'
+                    collapse_button.setAttribute('class', `px-7 py-2 mx-auto mb-5 mt-8 w-fit ${Styles.buttonCorner} border-5 text-amber-500 border-amber-500`)
+                    MakeClickable.expand_and_collapse_button(collapse_button)
+                    return collapse_button
+                },
+                //only_view_layout:
+                appointment_options: function(sess_id, day_id){
+                    const appointment_options_div = document.getElementById('appointment_options')
+                    appointment_options_div.classList.remove('hidden')
+
+                },
+                //panel_for_appointment
+                /*create_appointment_changes_container: function(data){
+                    //outer container with border
+                    const app_changes_container = document.createElement('div')
+                    const title = document.createElement('div')
+                    title.innerHTML = `Appointment details`
+                    const classed_title = FormatClasses.hidden_container_title(title)
+                    app_changes_container.appendChild(classed_title)
+                    const classed_app_changes_container = FormatClasses.hidden_containers(app_changes_container)
+                    const container = document.createElement('div')
+                    //select status
+                    const status_container = document.createElement('div')
+                    const status_title = document.createElement('div')
+                    status_title.innerHTML = `Status`
+                    status_title.setAttribute('class', `${Styles.textSemi} ${Styles.textColor}`)
+                    const change_status = Render.change_app_status(data['status'])
+                    status_container.appendChild(status_title)
+                    status_container.appendChild(change_status)
+                    const classed_status_container = FormatClasses.hidden_inner_inner_containers(status_container)
+                    container.appendChild(status_container)
+                    //select panel position
+                    const panel_position_container = document.createElement('div')
+                    const panel_position_title = document.createElement('div')
+                    panel_position_title.innerHTML = `Panel`
+                    panel_position_title.setAttribute('class', `${Styles.textSemi} ${Styles.textColor}`)
+                    panel_position_container.appendChild(panel_position_title)
+                    const panel_select = Render.panel_change_select()
+                    panel_position_container.appendChild(panel_select)
+                    const classed_panel_position_container = FormatClasses.hidden_inner_inner_containers(panel_position_container)
+                    container.appendChild(panel_position_container)
+                    container.setAttribute('class', 'grid gap-13')
+                    classed_app_changes_container.appendChild(container)
+                    return classed_app_changes_container
+                },*/
+                /*create_appointment_changes_container: function(){
+                    const app_changes_container = document.createElement('div')
+                    const title = document.createElement('div')
+                    title.innerHTML = `Appointment details`
+                    title.setAttribute('class', `${Styles.textSemi} ${Styles.textColor} absolute -translate-y-7 bg-[#F4F9FA]old bg-white px-1.5 translate-x-4`)
+                    app_changes_container.appendChild(title)
+                    app_changes_container.setAttribute('class', 'appointment_changes border-1 border-gray-300 rounded-md')
+                    return app_changes_container
+                },*/
+                create_images_to_delete: function(all_layouts){
+                    const csrf = document.querySelector('[name=csrfmiddlewaretoken]').value
+                    layout_select = document.getElementById('layout_all_delete')
+                    layout_select.innerHTML = ''
+                    const warning_div = document.createElement('div')
+                    warning_div.setAttribute('class', 'w-full flex justify-center sticky top-0 bg-stone-100')
+                    warning_div.innerHTML = `
+                    <div class="warning ${Styles.textWarning} ${Styles.textSemi} pt-3 pb-3">Beware you are in delete enviroment</div>
+                    `
+                    layout_select.appendChild(warning_div)
+                    const layouts = document.createElement('div')
+                    //layouts.setAttribute('class', 'grid grid-cols gap-4')
+                    for(let i = 0; i < all_layouts.length; i++){
+                        const img = document.createElement('img')
+                        img.setAttribute('src', all_layouts[i]['layout'])
+                        img.setAttribute('alt', 'Image unavailable')
+                        img.setAttribute('class', 'layout_img_to_delete')
+                        img.setAttribute('value', all_layouts[i]['id'])
+                        layouts.appendChild(img)
+                    }
+                    layout_select.appendChild(layouts)
+                    MakeClickable.images_to_delete()
+                },
+                delete_layout_button: function(){
+                    const button = document.createElement('div')
+                    button.setAttribute('class', 'w-full h-full bg-[#F4F9FA]old bg-white')
+                    button.innerHTML = `
+                        <div id="delete_layout" class="${Styles.textSemi} ${Styles.textWarning}">Delete Layout</div>
+                    `
+                    return button
+                },
+                update_appointment_status: function(appointment_id, new_status){
+                    const appointment_div = document.querySelector(`div[appointment_id='${appointment_id}']`)
+                    const status_div = appointment_div.querySelector('#status_display')
+                    const new_status_display = Components.status(new_status)
+                    status_div.innerHTML = new_status_display
+                },
+                update_panel_position : function(appointment_id, position){
+                    const appointment_div = document.querySelector(`div[appointment_id='${appointment_id}']`)
+                    const panel_position = appointment_div.querySelector('#panel_display')
+                    panel_position.innerHTML = `${position}`
+                },
+                update_panel_position2: function(appointment_id, position){
+                    const panel_position = document.querySelector(`.panel_position_display[appointment_id='${appointment_id}']`)
+                    const panel_label = document.getElementById(`position_label_${appointment_id}`)
+                    if(panel_label.classList.contains('hidden') && position !== ''){
+                        panel_label.classList.remove('hidden')
+                    }
+                    else if(!panel_label.classList.contains('hidden') && position === ''){
+                        panel_label.classList.add('hidden')
+                    }
+                    panel_position.innerHTML = `${position}`
+                },
+                add_layout_button : function(){
+                    const button = document.createElement('div')
+                    button.setAttribute('class', 'w-full h-full')
+                    button.innerHTML = `
+                    <div id="add_layout_container" class="w-full h-full bg-[#F4F9FA]old bg-white">
+                        <div id="layout_message" class="${Styles.textNormal} ${Styles.textColor} text-center mb-2 hidden"></div>
+                        <div id="upload_save" class="${Styles.textSemi} ${Styles.textColor} ${oxyBlue} ${Styles.buttonCorner} pt-[10px] pb-[10px] pr-4 pl-4 w-fit hidden">Save</div>
+                        <div id="upload_layout" class="h-full">
+                            <input class="hidden" type="file" id="layoutFile" name="filename">
+                            <label class="${Styles.textSemi} ${Styles.textColor}" for="layoutFile">Upload Layout</label>
+                        </div>
+                    </div>
+                    `
+                    return button
+                },
+                day_name_display : function(){
+                    const day_name_display = document.createElement('div')
+                    day_name_display.setAttribute('class', `${Styles.textNormal} text-gray-600 grid grid-cols-7 text-center mb-8`)
+                    const day_names = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+                    for(let i = 0; i < day_names.length; i++){
+                        const day_name = document.createElement('div')
+                        day_name.innerHTML = day_names[i]
+                        day_name_display.appendChild(day_name)
+                    }
+                    return day_name_display
+                },
+                register_new_patient : function(){
+                    const button_form = document.createElement('form')
+                    button_form.setAttribute('method', 'GET')
+                    button_form.setAttribute('action', '/registerNew/')
+                    const button = document.createElement('button')
+                    button.setAttribute('type', 'submit')
+                    button.setAttribute('class', 'font-medium mt-4 ml-4')
+                    button.innerHTML = 'Add Patient'
+                    button_form.appendChild(button)
+                    return button_form
+                },
+                search_patients_button : function(){
+                    const button_form = document.createElement('form')
+                    button_form.setAttribute('method', 'GET')
+                    button_form.setAttribute('action', '/searchPatients/')
+                    const button = document.createElement('button')
+                    button.setAttribute('type', 'submit')
+                    button.setAttribute('class', 'font-medium mt-4 ml-4')
+                    button.innerHTML = 'Search Patients'
+                    button_form.appendChild(button)
+                    return button_form
+                },
+                search_names : function(){
+                    function create_search_bar(){
+                        const input_div = document.createElement('div')
+                        input_div.setAttribute('class', 'z-10 mb-4')
+                        input_div.innerHTML = `
+                        <div class="flex bg-stone-50">
+                            <div class="p-[10px]">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 96 96" fill="none">
+                                    <path d="M61.7815 61.7448L90.25 90.25M71.4167 38.4583C71.4167 56.6608 56.6608 71.4167 38.4583 71.4167C20.256 71.4167 5.5 56.6608 5.5 38.4583C5.5 20.256 20.256 5.5 38.4583 5.5C56.6608 5.5 71.4167 20.256 71.4167 38.4583Z" stroke="#5BCBD6" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <input id="search_bar" placeholder="Search patients to add..." class="pt-[10px] pb-[10px] w-full focus:outline-none ${Styles.textNormal} ${Styles.textColor}"/>
+                        </div>
+                        `
+                        return input_div
+                    }
+                    /*const input_div = document.createElement('div')
+                    input_div.setAttribute('class', 'flex items-center bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-black mb-6')
+                    const input = document.createElement('input')
+                    input.setAttribute('id', 'search_bar')
+                    input.setAttribute('placeholder', 'Search...')
+                    input.setAttribute('class', 'block min-w-0 grow py-1.5 pr-3 pl-1 text-2xl text-gray-900 placeholder:text-gray-400 focus:outline-none mt-6 mb-6')
+                    input_div.appendChild(input)*/
+                    const input_div = create_search_bar()
+                    return input_div
+                },
+                session_times : function(selected_day, sessions){
+                    const session_times = document.getElementById('session_times')
+                    session_times.innerHTML = ''
+                    session_times.classList.remove('hidden')
+                    let back_arrow = Render.back_arrow()
+                    MakeClickable.back_to_calendar(back_arrow)
+                    const day_info = Render.day_info(selected_day)
+                    const message = document.createElement('div')
+                    message.innerHTML = `<div class="${Styles.textSemi}">Appointment times</div>`
+                    message.setAttribute('class', `text-center pb-8`)
+                    const session_display = Render.session_selection(sessions)
+                    session_times.appendChild(day_info)
+                    session_times.appendChild(message)
+                    session_times.appendChild(session_display)
+                    session_times.appendChild(back_arrow)
+                    session_display.setAttribute('day_id', selected_day.getAttribute('value'))
+                    MakeClickable.session_select()
+                },
+                day_info : function(selected_day){
+                    const day_info = document.createElement('div')
+                    day_info.id = 'day_info'
+                    day_info.setAttribute('class', `text-center ${Styles.textNormal} ${Styles.textColor} pb-7 pt-8`)
+                    day_iso = new Date(selected_day.getAttribute('iso_date'))
+                    day_info_d = document.createElement('div')
+                    day_info_d.innerHTML = day_iso.toLocaleDateString('en-GB', { day: 'numeric' }) + ' ' + day_iso.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
+                    day_info.appendChild(day_info_d)
+                    return day_info
+                },
+                session_selection : function(sessions){
+                    const session_display = document.createElement('div')
+                    session_display.setAttribute('class', 'grid gap-5 pb-8')
+                    session_display.id = 'session_display'
+                    for (let j = 0; j < sessions.length; j++){
+                        const div = document.createElement('div')
+                        div.innerHTML = sessions[j]['time']
+                        div.setAttribute('class', `sess_time ${Styles.textNormal} ${Styles.textColor} ${Styles.buttonCorner} ${oxyBlue} py-[12px] px-32 m-auto text-center`)
+                        div.setAttribute('value', sessions[j]['id'])
+                        session_display.appendChild(div)
+                    }
+                    return session_display
+                },
+                year_display : function(month, year){
+                    //change year
+                    const year_display = document.createElement('div')
+                    year_display.id = 'year_display'
+                    const year_dropdown = document.createElement('select')
+                    year_dropdown.setAttribute('class', Styles.textNormal)
+                    for(let y = 2025; y <= 2100; y++){
+                        const option = document.createElement('option')
+                        option.setAttribute('value', y)
+                        option.innerHTML = y
+                        if(y === year){
+                            option.selected = true
+                        }
+                        year_dropdown.appendChild(option)
+                    }
+                    year_dropdown.addEventListener('change', (e) => {
+                        const new_year = parseInt(e.currentTarget.value)
+                        get_month(month, new_year)
+                    })
+                    year_display.appendChild(year_dropdown)
+                    /*year_display.setAttribute('class', 'flex justify-between items-center')
+                    /*const left_year_arrow = document.createElement('div')
+                    left_year_arrow.innerHTML = "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-6\">\n  <path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15.75 19.5 8.25 12l7.5-7.5\" />\n</svg>"
+                    left_year_arrow.id = 'left_year_arrow'
+                    MakeClickable.left_year_arrow(left_year_arrow, month, year)
+                    const right_year_arrow = document.createElement('div')
+                    right_year_arrow.innerHTML = "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-6\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"m8.25 4.5 7.5 7.5-7.5 7.5\" /></svg>"
+                    right_year_arrow.id = 'right_year_arrow'
+                    MakeClickable.right_year_arrow(right_year_arrow, month, year)
+                    const year_digit = document.createElement('div')
+                    year_digit.id = 'year_digit'
+                    year_digit.setAttribute('class', 'text-5xl')
+                    year_digit.innerHTML = year
+                    year_display.appendChild(left_year_arrow)
+                    year_display.appendChild(year_digit)
+                    year_display.appendChild(right_year_arrow)*/
+                    return year_display
+                },
+                month_display : function(month, year){
+                    //change month
+                    const month_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+                    const month_display = document.createElement('div')
+                    month_display.id = 'month_display'
+                    month_display.setAttribute('class', Styles.textNormal)
+                    const month_dropdown = document.createElement('select')
+                    month_dropdown.setAttribute('class', Styles.textNormal)
+                    for(let m = 1; m <= 12; m++){
+                        const option = document.createElement('option')
+                        option.setAttribute('value', m)
+                        option.setAttribute('class', Styles.textNormal)
+                        option.innerHTML = month_names[m-1]
+                        if(m === month){
+                            option.selected = true
+                        }
+                        month_dropdown.appendChild(option)
+                    }
+                    month_dropdown.addEventListener('change', (e) => {
+                        const new_month = parseInt(e.currentTarget.value)
+                        get_month(new_month, year)
+                    })
+                    month_display.appendChild(month_dropdown)   
+
+                    /*const left_arrow = document.createElement('div')
+                    left_arrow.innerHTML = "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-6\">\n  <path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15.75 19.5 8.25 12l7.5-7.5\" />\n</svg>"
+                    left_arrow.id = 'left_arrow'
+                    MakeClickable.left_arrow(left_arrow, month, year)
+                    const right_arrow = document.createElement('div')
+                    right_arrow.innerHTML = "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-6\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"m8.25 4.5 7.5 7.5-7.5 7.5\" /></svg>"
+                    right_arrow.id = 'right_arrow'
+                    MakeClickable.right_arrow(right_arrow, month, year)
+                    const month_name = document.createElement('div')
+                    month_name.id = 'month_name'
+                    month_name.setAttribute('class', 'text-5xl')
+                    month_name.innerHTML = `${month_names[month-1]}`
+                    month_display.appendChild(left_arrow)
+                    month_display.appendChild(month_name)
+                    month_display.appendChild(right_arrow)*/
+                    return month_display
+                },
+                calendar_dates : function(data){
+                    const calendar = document.createElement('div')
+                    calendar.id = 'calendar'
+                    calendar.setAttribute('class', 'grid grid-cols-7 w-full gap-2')
+                    for (let i = 0; i < data.length; i++){
+                        if(!data[i]['day']){
+                            div = document.createElement('div')
+                            div.setAttribute('class', 'empty cal_unit')
+                            calendar.appendChild(div)
+                        }
+                        else{
+                            div = document.createElement('div')
+                            div.setAttribute('class', `day cal_unit ${oxyBlue} ${Styles.buttonCorner} text-gray-900 text-center align-middle flex justify-center items-center`)
+                            div.setAttribute('iso_date', data[i]['day_iso'])
+                            const date_dis = document.createElement('div')
+                            date_dis.setAttribute('class', `h-fit ${Styles.textNormal}`)
+                            date_dis.innerHTML = `${data[i]['day']}`
+                            div.appendChild(date_dis)
+                            div.setAttribute('value', data[i]['id'])
+                            calendar.appendChild(div)
+                        }
+                    }
+                    return calendar
+                },
+                booked_patient_name : function(data){
+                    const d_name = document.createElement('div')
+                    d_name.innerHTML = data['name']
+                    d_name.setAttribute('class', `patient_name text-medium`)
+                    return d_name
+                },
+                    /*'
+                    id':app.id,
+                    'name':f"{app.patientID.first_name} {app.patientID.last_name}",
+                    'patient_id':app.patientID.personID,
+                    'depth':app.patientID.depth.depth if app.patientID.depth else None,
+                    'mask': app.patientID.mask.mask if app.patientID.mask else None,
+                    'size': PersonalInfo.get_size(app.patientID.mask.mask, app.patientID.sizeId) if app.patientID.mask and app.patientID.sizeId else None,
+                    'pipe_length': app.patientID.pipe_length.length if app.patientID.pipe_length else None,
+                    'carer': app.patientID.carer,
+                    'status':app.appointmentStatus,
+                    'notes':app.patientID.noteID.note if app.patientID.noteID else None,
+                    'extras': extras,
+                    'phone_number': app.patientID.phone_number,
+                    'num_sess':len(attended_group),
+                    'balance': total,
+                    'appointment_id': app.id
+                    */
+                visible_patient_details : function(data){
+                    let status = Components.status(data['status'])
+
+                    const d_info = document.createElement('div')
+                    d_info.innerHTML = `
+                        <div class="flex justify-between">
+                            <div>Mask:</div><div>${data['mask']}</div>
+                        </div>
+                        <div class="flex justify-between">
+                            <div>Mask Size:</div><div>${data['size']}</div>
+                        </div>
+                        <div class="flex justify-between">
+                            <div>Pipe Length:</div><div>${data['pipe_length']}</div>
+                        </div>
+                        <div class="flex justify-between">
+                            <div>Appointment:</div><div>${data['num_sess']}</div>
+                        </div>
+                        <div class="flex justify-between">
+                            <div>Panel:</div><div id="panel_display">${data['position']}</div>
+                        </div>
+                        <div class="flex justify-between">
+                            <div>Status:</div><div id="panel_display">${status}</div>
+                        </div>       
+                    `
+                    /*const d_sess = document.createElement('div')
+                    d_sess.innerHTML = `Appts. ${data['num_sess']}`
+                    d_info.appendChild(d_sess)
+                    const d_size = document.createElement('div')
+                    d_size.innerHTML = data['size']*/
+                    d_info.setAttribute('class', `shown_info ${Styles.textNormal} ${Styles.textColor} gap-5 grid w-full`)
+                    return d_info
+                },
+                misc_patient_details : function(data){
+                    const d_other_info = document.createElement('div')
+                    //const title = document.createElement('div')
+                    //title.innerHTML = 'Information'
+                    //title.setAttribute('class', `${Styles.textSemi} ${Styles.textColor} absolute -translate-y-7 bg-[#F4F9FA]old bg-white px-1.5 translate-x-4`)
+                    //d_other_info.appendChild(title)
+                    const info = document.createElement('div')
+                    info.setAttribute('class', `grid gap-5 ${Styles.textNormal} ${Styles.textColor}`)
+                    //carer
+                    if (data['carer']){
+                        const d_carer = document.createElement('div')
+                        d_carer.setAttribute('class', 'flex justify-between gap-5')
+                        d_carer.innerHTML = `<div>Carer:</div><div>Yes</div>`
+                        info.appendChild(d_carer)
+                    }
+                    //cost
+                    if (data['price']){
+                        const d_cost = document.createElement('div')
+                        d_cost.setAttribute('class', 'flex justify-between gap-5')
+                        d_cost.innerHTML = `<div>Price:</div><div>£${data['price']}</div>`
+                        info.appendChild(d_cost)
+                    }
+                    //notes
+                    if (data['notes']){
+                        const d_notes = document.createElement('div')
+                        d_notes.setAttribute('class', 'flex justify-between gap-5')
+                        d_notes.innerHTML = `<div>Notes:</div><div class="text-justify">${data['notes']}</div>`
+                        info.appendChild(d_notes)
+                    }
+                    //extras
+                    if (data['extras']){
+                        const d_extras = document.createElement('div')
+                        d_extras.setAttribute('class', 'flex justify-between gap-5')
+                        d_extras.innerHTML = `<div>Give:</div><div class="text-right">${data['extras']}</div>`
+                        info.appendChild(d_extras)
+                    }
+                    //phone number
+                    const d_phone = document.createElement('div')
+                    d_phone.setAttribute('class', 'flex justify-between gap-5')
+                    d_phone.innerHTML = `<div>Phone:</div><div>${data['phone_number']}</div>`
+                    info.appendChild(d_phone)
+                    d_other_info.appendChild(info)
+                    //d_other_info.setAttribute('class', `other_info border-1 border-gray-300 rounded-md px-3 py-3 `)
+                    return d_other_info
+                },
+                panel_change_select: function(){
+                    
+                    //create the select options
+                    const options = []
+                    for(let i = 1; i <= 6; i++){
+                        options.push({value: i, text: `Panel ${i}`})
+                    }
+
+                    //create the select
+                    const select = Components.select('Panel', options)
+                    select.setAttribute('class', `${Styles.textNormal} ${Styles.textColor} ${Styles.selectCorner} pt-[8px] pb-[8px] pl-5 bg-gray-200 outline ${oxyColorOutline} w-48`)
+                    
+                    //make the page responsive to changes in select
+                    MakeClickable.panel_change(select)
+
+                    return select
+                },
+                panel_change_select2: function(appointment_id){
+                    
+                    //create the select options
+                    const options = []
+                    for(let i = 1; i <= 6; i++){
+                        options.push({value: i, text: `Panel ${i}`})
+                    }
+
+                    //create the select
+                    const select = Components.select('Panel', options)
+                    select.setAttribute('class', `${Styles.textNormal} ${Styles.textColor} ${Styles.selectCorner} py-[12px] pl-5 bg-gray-200 outline outline-2 ${oxyColorOutline} w-full`)
+                    select.setAttribute('appointment_id', appointment_id)
+                    //make the page responsive to changes in select
+                    MakeClickable.panel_change2(select)
+
+                    return select
+                },
+                cancel_button : function(){
+                    const container = document.createElement('div')
+                    container.setAttribute('class', 'flex justify-end')
+                    const cancel_button = document.createElement('div')
+                    cancel_button.setAttribute('class', `${Styles.textSemi} ${Styles.buttonCorner} pt-[10px] pb-[10px] cancel_appointment pl-8 pr-8 w-fit mt-1 border-5 border-red-500 text-red-700 bg-red-500/30`)
+                    cancel_button.innerHTML = 'Cancel'
+                    MakeClickable.cancel_button(cancel_button)
+                    container.appendChild(cancel_button)
+                    return container
+                },
+                status_section: function(data){
+                    const status_container = document.createElement('div')
+                    status_container.setAttribute('class', '')
+                    const status_title = document.createElement('div')
+                    status_title.innerHTML = `Change appointment status:`
+                    status_title.setAttribute('class', `mb-3`)
+                    const change_status = Render.change_app_status(data['status'], data)
+                    status_container.appendChild(status_title)
+                    status_container.appendChild(change_status)
+                    return status_container
+                },
+                hidden_info : function(data){
+                    const d_hidden_info = document.createElement('div')
+                    d_hidden_info.setAttribute('class', 'hide_info hidden grid gap-12 px-4 pb-4 pt-1')
+                    const miscalanous_info = Render.misc_patient_details(data)
+                    d_hidden_info.appendChild(miscalanous_info)
+                    //container for appointment changes
+                    //const app_changes_container = Render.create_appointment_changes_container(data)
+                    const status_section = Render.status_section(data)
+                    d_hidden_info.appendChild(status_section)
+                    //const classed_status_container = FormatClasses.hidden_inner_inner_containers(status_container)
+                    //d_hidden_info.appendChild(status_container)
+                    //const panels = Render.panel_for_appointment(data)
+                    //app_changes_container.appendChild(panels)
+                    //d_hidden_info.appendChild(app_changes_container)
+                    //payments
+                    //const payments_div = Finances.generate_payment_divs(data['balance'])
+                    //d_hidden_info.appendChild(payments_div)
+                    //cancel
+                    const cancel_button = Render.cancel_button()
+                    d_hidden_info.appendChild(cancel_button)
+                    return d_hidden_info
+                },
+                /*payment_page: function(data){
+                    const payment_page_container = document.getElementById('payments_patient_container')
+                    payment_page_container.innerHTML = ''
+                    for(let i = 0; i < data.length; i++){
+                        const ind_patient_payment = document.createElement('div')
+                        ind_patient_payment.innerHTML = 
+                        `
+                        <div class="py-4 bg-[#F4F9FA]old bg-white px-2">
+                            <div>${data[i]['name']}</div>
+                            <div>Balance: £${data[i]['balance']}</div>
+                            <input class="${input_classes}" placeholder="0.00"></input>
+                        </div>
+                        `
+                        payment_page_container.appendChild(ind_patient_payment)
+                    }
+                    return payment_page_container
+                },*/
+                add_patient_to_selection : function(data){
+                    const name = data['first_name'] + ' ' + data['last_name']
+                    const id = data['id']
+                    const div = document.createElement('div')
+                    div.innerHTML = `<div class="px-7 h-16 flex items-center bg-[#F4F9FA]old bg-white justify-between">
+                                        <div class="add_person_name font-semibold">${name}</div>
+                                        <div class="py-[12px] w-24 text-center rounded-sm add_patient_button ${oxyBlue}">Add</div>
+                                    </div>`
+                    /*div.innerHTML = `<div class="flex ${Styles.textNormal} ${Styles.textColor} justify-between items-center pt-[10px] pb-[10px] ${oxySecondry} ${Styles.buttonCorner}">
+                                        <div class="flex justify-center items-center pr-1 pl-1.5">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 61 60" fill="none">
+                                                <path d="M30.25 1.25V58.25" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M1.25 30.25H59.25" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </div>
+                                        <div class="pr-1.5 add_person_name">${name}</div>
+                                    </div>`*/
+                    div.setAttribute('class', 'patient_option w-full h-fit')
+                    div.setAttribute('value', id)
+                    /*const div_name = document.createElement('div')
+                    div_name.innerHTML = name
+                    div_name.setAttribute('class', 'add_person_name font-semibold')
+                    const div_add = document.createElement('div')
+                    div_add.innerHTML = '+'
+                    div_add.setAttribute('class', 'add_patient_button font-semibold')
+                    div.appendChild(div_name)
+                    div.appendChild(div_add)*/
+                    return div
+                },
+                add_booked_patient_to_selection: function(data){
+                    const name = data['first_name'] + ' ' + data['last_name']
+                    const id = data['id']
+                     const booked_patient_div = Components.booked_in_patient_div(name, id)
+                    return booked_patient_div
+                },
+                back_arrow : function(){
+                    /*const back_arrow = document.createElement('div')
+                    back_arrow.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>'
+                    back_arrow.id = 'back_arrow'
+                    back_arrow.setAttribute('class', 'p-3 rounded-full shadow-xs shadow-gray-300 absolute top-9 left-9 bg-white')*/
+                    const back_arrow = document.createElement('span')
+                    return back_arrow
+                },
+                layout_image : function(layout_url){
+                    const layout_d = document.createElement('img')
+                    layout_d.id = 'layout'
+                    layout_d.setAttribute('src', layout_url)
+                    layout_d.setAttribute('alt', 'pic of layout')
+                    //layout_d.setAttribute('class', 'shadow-md')
+                    return layout_d
+                },
+                no_image : function(){
+                    const no_image = document.createElement('div')
+                    no_image.innerHTML = 'No Layout'
+                    no_image.setAttribute('class', 'text-gray-400 italic')
+                    return no_image
+                },
+                layout_options : function(all_layouts, selected_layout_id){
+                    layout_select = document.getElementById('layout_all')
+                    layout_select.innerHTML = ''
+                    for(let i = 0; i < all_layouts.length; i++){
+                        //image container
+                        const img_cont = document.createElement('div')
+                        img_cont.setAttribute('class', 'pt-8 px-3 bg-[#F4F9FA]old bg-white flex flex-col items-center')
+                        //image
+                        const img = document.createElement('img')
+                        img.setAttribute('src', all_layouts[i]['layout'])
+                        img.setAttribute('alt', 'Image unavailable')
+                        img.setAttribute('width', 'auto')
+                        //button
+                        let select_button
+                        if(all_layouts[i]['id'] === selected_layout_id){
+                            select_button = OxyButton('This is the chosen layout', `w-[70%] mb-5 mt-3 text-center ${Styles.buttonCorner} bg-gray-300`)
+                        }
+                        else{
+                            select_button = OxyButton('Choose this layout', `select_n_layout w-[70%] mb-5 mt-3 text-center ${Styles.buttonCorner} ${oxyBlue}`)
+                            select_button.setAttribute('value', all_layouts[i]['id'])
+                        }
+                        img_cont.appendChild(img)
+                        img_cont.appendChild(select_button)
+                        layout_select.appendChild(img_cont)
+                    }
+                    /*upload_button = document.createElement('input')
+                    upload_button.setAttribute('type', 'file')
+                    upload_button.setAttribute('id', 'upload_new_layout')
+                    upload_button.setAttribute('class', 'p-0.5')
+                    upload_new.appendChild(upload_button)*/
+                    /*const save_layout = document.createElement('div')
+                    save_layout.innerHTML = 'Upload New Layout'
+                    save_layout.setAttribute('class', 'font-medium mt-0.5 ml-0.5')
+                    save_layout.setAttribute('id', 'save_layout')
+                    upload_new.appendChild(save_layout)*/
+                    //layout_select.appendChild(upload_new)
+                    MakeClickable.layout_options()
+                },
+                change_layout_button : function(){
+                    const layout_options_d = document.createElement('div')
+                    layout_options_d.innerHTML = 'Change Layout'
+                    layout_options_d.id = 'layout_options'
+                    layout_options_d.setAttribute('class', `${Styles.textSemi} ${Styles.textColor} bg-[#F4F9FA]old bg-white w-full h-full`)
+                    layout_options_d.addEventListener('click', (e) => {
+                        const layout_all = document.getElementById('layout_all')
+                        const layout_delete_view = document.getElementById('layout_all_delete')
+                        if (layout_all.classList.contains('hidden') && !layout_delete_view.classList.contains('hidden')){
+                            layout_delete_view.classList.add('hidden')
+                            layout_all.classList.remove('hidden')
+                        }
+                        else if (layout_all.classList.contains('hidden') && layout_delete_view.classList.contains('hidden')){
+                            layout_all.classList.remove('hidden')
+                        }
+                        else{
+                            layout_all.classList.add('hidden')
+                        }
+                    })
+                    return layout_options_d
+                },
+                change_app_status: function(curr_status, data){
+                    const selection = document.createElement('select')
+                    selection.setAttribute('class', `focus:none bg-gray-200 outline-1 ${Styles.textColor} ${Styles.textNormal} ${oxyColorOutline} ${Styles.selectCorner} pl-5 pt-[10px] pb-[10px] h-fit w-full`)
+                    selection.setAttribute('appointment_id', data['id'])
+                    selection.setAttribute('patient_id', data['patient_id'])
+                    const empty_option = document.createElement('option')
+                    empty_option.value = 'SCHE'
+                    empty_option.innerHTML = 'Select'
+                    empty_option.setAttribute('class', 'text-5xl')
+                    //attended option
+                    const option_attended = document.createElement('option')
+                    option_attended.value = 'ATTE'
+                    option_attended.setAttribute('class', 'text-5xl')
+                    option_attended.innerHTML = 'Attended'
+                    if(curr_status === 'ATTE'){
+                        option_attended.selected = true
+                    }
+                    //missed option
+                    const missed = document.createElement('option')
+                    missed.value = 'MISS'
+                    missed.setAttribute('class', 'text-5xl')
+                    missed.innerHTML = 'Missed'
+                    if(curr_status === 'MISS'){
+                        missed.selected = true
+                    }
+                    //unwell option
+                    const unwell = document.createElement('option')
+                    unwell.value = 'UNWE'
+                    unwell.setAttribute('class', 'text-5xl')
+                    unwell.innerHTML = 'Unwell'
+                    if(curr_status === 'UNWE'){
+                        unwell.selected = true
+                    }
+                    selection.appendChild(empty_option)
+                    selection.appendChild(option_attended)
+                    selection.appendChild(missed)
+                    selection.appendChild(unwell)
+                    MakeClickable.change_app_status(selection, curr_status)
+                    return selection
+                },
+            }
+            
+            Run = {
+                show_error : function(message){
+                    const error_div = document.getElementById('error_div')
+                    const error_message = document.getElementById('error_message')
+                    error_message.innerHTML = message
+                    error_div.classList.remove('hidden')
+                    setTimeout(() =>{ error_div.classList.add('hidden') }, 10000);
+                },
+                refresh_all_layouts : function(){
+                    const sess_id = document.getElementById('patient_details').getAttribute('session_id')
+                    const day_id = document.getElementById('patient_details').getAttribute('day_id')
+                    const csrf = document.querySelector('[name=csrfmiddlewaretoken]').value
+                    fetch('/layoutFind/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrf
+                        },
+                        body: JSON.stringify({'session_id': sess_id, 'day_id': day_id})
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const all_layouts = data['all_layouts']
+                        Render.layout_options(all_layouts)
+                        //Render.create_images_to_delete(all_layouts)
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+                },
+                clear_image_upload : function(){
+                    const layoutFile = document.getElementById('layoutFile')
+                    layoutFile.value = ''
+                },
+                switch_to_upload_image : function(){
+                    const image_upload = document.getElementById('upload_layout')
+                    const save_image = document.getElementById('upload_save')
+                    save_image.classList.add('hidden')
+                    image_upload.classList.remove('hidden')
+                },
+                calc_cal_height : function(){
+                    const calendar_units = document.querySelectorAll('.cal_unit')
+                    const width = calendar_units[0].offsetWidth
+                    calendar_units.forEach(calendar_unit => {
+                        calendar_unit.style.height = (width + 'px')
+                    })
+                },
+                updateStyles: function(){
+                    const text_large = document.querySelectorAll('.text-large')
+                    for(let i = 0; i < text_large.length; i++){
+                        old_class = text_large[i].getAttribute('class')
+                        old_class = old_class.replace('text-large', '')
+                        text_large[i].setAttribute('class', `${Styles.HierArchOne} ${Styles.textColor} ${old_class}` )
+                    }
+                    const text_medium = document.querySelectorAll('.text-medium')
+                    for(let i = 0; i < text_medium.length; i++){
+                        old_class = text_medium[i].getAttribute('class')
+                        old_class = old_class.replace('text-medium', '')
+                        text_medium[i].setAttribute('class', `${Styles.HierArchTwo} ${Styles.textColor} ${old_class}` )
+                    }  
+                    const text_small = document.querySelectorAll('.text-small')
+                    for(let i = 0; i < text_small.length; i++){
+                        old_class = text_small[i].getAttribute('class')
+                        old_class = old_class.replace('text-small', '')
+                        text_small[i].setAttribute('class', `${Styles.HierArchThree} ${Styles.textColor} ${old_class}` )
+                    }
+                    const text_oxy_blue = document.querySelectorAll('.text-oxy-blue')
+                    for(let i = 0; i < text_oxy_blue.length; i++){
+                        old_class = text_oxy_blue[i].getAttribute('class')
+                        old_class = old_class.replace('text-oxy-blue', '')
+                        text_oxy_blue[i].setAttribute('class', `${textOxy} ${old_class}` )
+                    }  
+                    const text_semi = document.querySelectorAll('.text-semi')
+                    for(let i = 0; i < text_semi.length; i++){
+                        old_class = text_semi[i].getAttribute('class')
+                        old_class = old_class.replace('text-semi', '')
+                        text_semi[i].setAttribute('class', `${Styles.textSemi} ${Styles.textColor} ${old_class}` )
+                    } 
+                },
+            }
+            const Refresh = {
+                todays_layout : function(){
+                    const sess_id = document.getElementById('patient_details').getAttribute('session_id')
+                    const day_id = document.getElementById('patient_details').getAttribute('day_id')
+                    const csrf = document.querySelector('[name=csrfmiddlewaretoken]').value
+                    fetch('/todayLayout/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrf
+                        },
+                        body: JSON.stringify({'session_id': sess_id, 'day_id': day_id})
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const layout = data['layout']
+
+                        if(layout){
+                            const layout_display_cont = document.getElementById('layout_container')
+                            layout_display_cont.innerHTML = ''
+                            const image = document.createElement('img')
+                            image.setAttribute('src', layout)
+                            image.setAttribute('alt', 'Layout Image')
+                            //image.setAttribute('class', w-80')
+                            layout_display_cont.appendChild(image)
+                            document.getElementById('yes_layout_container').classList.remove('hidden')
+                            document.getElementById('no_layout_container').classList.add('hidden')
+                            document.getElementById('only_view_layout').classList.remove('hidden')
+                        }
+                        else{
+                            document.getElementById('no_layout_container').classList.remove('hidden')
+                            document.getElementById('yes_layout_container').classList.add('hidden')
+                            document.getElementById('only_view_layout').classList.remove('hidden')
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        Run.show_error('Could not retrieve today\'s layout')
+                    });
+                },
+                patients_booked : function(sess_id, day_id){
+                    const xhttp = new XMLHttpRequest()
+                    xhttp.onreadystatechange = function() {
+                        if(this.readyState == 4 && this.status == 200) {
+                            const data = JSON.parse(this.responseText)
+                            const booked_in_div = document.getElementById('booked_in_div')
+                            booked_in_div.innerHTML = ''
+                            booked_in_div.id = 'booked_in_div'
+                            back_arrow = Render.back_arrow()
+                            MakeClickable.back_to_times(back_arrow)
+                            booked_in_div.appendChild(back_arrow)
+                            const other_ppl_div = document.createElement('div')
+                            other_ppl_div.id = 'other_ppl_div'
+                            const layout_div = document.createElement('div')
+                            layout_div.id = 'layout_div'
+                            for(let i = 0; i < data.length; i++){
+                                const div = document.createElement('div')
+                                const view_div = document.createElement('div')
+                                view_div.setAttribute('class', 'visible_info flex justify-between px-4 pb-4 pt-6 items-center')
+                                const left_cont = document.createElement('div')
+                                left_cont.setAttribute('class', 'flex flex-col w-full gap-8')
+                                const div_name = Render.booked_patient_name(data[i])
+                                const d_info = Render.visible_patient_details(data[i])
+                                const d_hidden_info = Render.hidden_info(data[i])
+                                const expand_collapse = Render.expand_and_collapse()
+                                left_cont.appendChild(div_name)
+                                left_cont.appendChild(d_info)
+                                view_div.appendChild(left_cont)
+                                //view_div.appendChild(d_status)
+                                div.appendChild(view_div)
+                                div.appendChild(d_hidden_info)
+                                div.appendChild(expand_collapse)
+                                div.setAttribute('class', `booked_in bg-[#F4F9FA]old bg-white rounded-xs shadow-sm`)
+                                div.setAttribute('person_id', data[i]['patient_id'])
+                                div.setAttribute('appointment_id', data[i]['appointment_id'])
+                                booked_in_div.appendChild(div)
+                            }
+                            //make links to payments and panel change
+                            //const payment_link = Render.payment_links()
+                            //Render.payment_page(data)
+                            //MakeClickable.link_to_payment(payment_link)
+                            //booked_in_div.appendChild(payment_link)
+                            //const panel_link = Render.panel_change_links()
+                            //PersonInfo.accordianCreate()
+                            Finances.make_save_payment_clickable()
+                            PersonInfo.remove_booked_in_ppl()
+                            Run.updateStyles()
+                            
+                        }
+                        else if(this.readyState == 4 && this.status !== 200){
+                            Run.show_error('Error retrieving patient information')
+                        }
+                    }
+                    xhttp.open('POST', `${window.location.origin}/appointmentsPatientInfo/`)
+                    xhttp.setRequestHeader('X-CSRFToken', csrf)
+                    const dict_to_send = {'session_id': sess_id, 'day_id': day_id}
+                    const form_json = JSON.stringify(dict_to_send)
+                    xhttp.send(form_json)
+                },
+                payment_page: function(sess_id, day_id){
+                    const xhttp = new XMLHttpRequest()
+                    xhttp.onreadystatechange = function() {
+                        if(this.readyState == 4 && this.status == 200) {
+                            const data = JSON.parse(this.responseText)
+                            const payment_page_container = document.getElementById('payments_div')
+                            payment_page_container.innerHTML = ''
+                            for(let i = 0; i < data.length; i++){
+                                const ind_patient_payment = document.createElement('div')
+                                const balance_span = Components.balance_span2(data[i]['balance'], data[i]['patient_id'])
+                                ind_patient_payment.innerHTML = 
+                                `
+                                <div class="py-8 bg-[#F4F9FA]old bg-white px-3">
+                                    <div class="flex justify-between items-center mb-7">
+                                        <div class="font-semibold text-2xl">${data[i]['name']}</div>
+                                        <div class="">Balance: £<span class="font-semibold">${balance_span.outerHTML}</span></div>
+                                    </div>
+                                    <input person_id="${data[i]['patient_id']}" class=" ${input_classes}" placeholder="0.00"></input>
+                                    <div class="server_response_payments min-h-4" person_id="${data[i]['patient_id']}"></div>
+                                    <div class="save_payment2 ${Styles.buttonPadding} ${Styles.buttonCorner} text-center ${oxyBlue}" person_id="${data[i]['patient_id']}">Save Payment</div>
+                                </div>
+                                `
+                                payment_page_container.appendChild(ind_patient_payment)
+                            }
+                            Finances.make_save_payment_clickable2()
+                            Run.updateStyles()  
+                        }
+                        else if(this.readyState == 4 && this.status !== 200){
+                            Run.show_error('Error retrieving patient information')
+                        }
+                    }
+                    xhttp.open('POST', `${window.location.origin}/appointmentsPatientInfo/`)
+                    xhttp.setRequestHeader('X-CSRFToken', csrf)
+                    const dict_to_send = {'session_id': sess_id, 'day_id': day_id}
+                    const form_json = JSON.stringify(dict_to_send)
+                    xhttp.send(form_json)    
+                },
+                panel_page : function(sess_id, day_id){
+                    const xhttp = new XMLHttpRequest()
+                    xhttp.onreadystatechange = function() {
+                        if(this.readyState == 4 && this.status == 200) {
+                            const data = JSON.parse(this.responseText)
+                            const panel_container = document.getElementById('panel_div')
+                            panel_container.innerHTML = ''
+                            const panel_page = Render.panel_page(data)
+                            panel_container.classList.remove('hidden')
+                        }
+                    }
+                    xhttp.open('POST', `${window.location.origin}/appointmentsPatientInfo/`)
+                    xhttp.setRequestHeader('X-CSRFToken', csrf)
+                    const dict_to_send = {'session_id': sess_id, 'day_id': day_id}
+                    const form_json = JSON.stringify(dict_to_send)
+                    xhttp.send(form_json)
+                },
+                add_appointment_section : function(sess_id, day_id){
+                    fetch(`/allPatientsSearch/?session_id=${sess_id}&day_id=${day_id}`, {
+                        method : 'GET',
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const session_id = data['session_id']
+                        const day_id = data['day_id']
+                        const add_patient = document.getElementById('add_patient')
+                        add_patient.id = 'add_patient'
+                        add_patient.innerHTML = ''
+                        add_patient.setAttribute('session_id', session_id)
+                        add_patient.setAttribute('day_id', day_id)
+                        const input = Render.search_names()
+                        add_patient.appendChild(input)
+                        let letter_tracker = data['all_ppl'][0].last_name.charAt(0).toUpperCase()
+                        let letter_display = Render.letter_div(letter_tracker)
+                        add_patient.appendChild(letter_display)
+                        //const patient_list = document.createElement('div')
+                        //patient_list.setAttribute('class', 'grid gap-2 mx-3 bg-[#EBF6F7]old bg-gray-50')
+                        const ppl_booked = data['ppl_booked']
+                        console.log(ppl_booked)
+                        const ppl = data['all_ppl']
+                        for(let i = 0; i < ppl.length; i++){
+                            if(ppl[i].last_name.charAt(0).toUpperCase() !== letter_tracker){
+                                letter_tracker = ppl[i].last_name.charAt(0).toUpperCase()
+                                letter_display = Render.letter_div(letter_tracker)
+                                add_patient.appendChild(letter_display)
+                            }
+                            let div
+                            if(!ppl_booked.includes(ppl[i]['id'])){
+                                div = Render.add_patient_to_selection(ppl[i])
+                            }
+                            else{
+                                div = Render.add_booked_patient_to_selection(ppl[i])
+                            }
+                            letter_display.appendChild(div)
+                        }
+                        //add_patient.appendChild(patient_list)
+                        MakeClickable.search_names()
+                        MakeClickable.add_to_appointment()
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+                },
+                layout : function(sess_id, day_id){
+                    fetch('/layoutFind/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrf
+                        },
+                        body: JSON.stringify({'session_id': sess_id, 'day_id': day_id})
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const layout = data['layout']
+                        let layout_id 
+                        if(layout){
+                            layout_id = data['layout']['id']
+                        }
+                        const all_layouts = data['all_layouts']
+                        const chosen_layout_container = document.getElementById('current_layout_choice')
+                        const layout_display_d = document.getElementById('layout_display')
+                        layout_display_d.innerHTML = ''
+                        layout_display_d.id = 'layout_display'
+                        let layout_d
+                        if(layout){
+                            layout_d = Render.layout_image(layout['image'])
+                            layout_display_d.appendChild(layout_d)
+                            chosen_layout_container.classList.remove('hidden')
+                        }
+                        //button container
+                        const button_container = document.createElement('div')
+                        button_container.setAttribute('class', 'flex items-center text-center gap-1 w-full h-15 bg-gray-200')
+                        //change layout button
+                        /*const change_layout_button = Render.change_layout_button()
+                        button_container.appendChild(change_layout_button)*/
+                        //add layout button
+                        /*const add_layout_button = Render.add_layout_button()
+                        button_container.appendChild(add_layout_button)*/
+                        //delete layout button
+                        /*const delete_layout_button = Render.delete_layout_button()
+                        button_container.appendChild(delete_layout_button)*/
+                        //layout_display_d.appendChild(button_container)
+                        //MakeClickable.layout_button(add_layout_button)
+                        //MakeClickable.delete_layout()
+                        //MakeClickable.send_layout()
+                        //all layouts
+                        Render.layout_options(all_layouts, layout_id)
+                        //Render.create_images_to_delete(all_layouts)
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+                },
+            }
+            function get_month(month, year){
+                fetch('/monthGenerator/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrf
+                    },
+                    body: JSON.stringify({'month': month, 'year':year})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    //render the calendar data on the page
+                    const calendar_container = document.getElementById('calendar_container')
+                    calendar_container.innerHTML = ''
+                    const year_display = Render.year_display(month, year)
+                    const month_display = Render.month_display(month, year)
+                    const day_name_display = Render.day_name_display()
+                    const calendar = Render.calendar_dates(data)
+                    const message = document.createElement('div')
+                    message.setAttribute('class', `text-center mt-8 ${Styles.textSemi}`)
+                    message.innerHTML = 'Select to go to appointment times'
+                    //const register_new_patient = Render.register_new_patient()
+                    //const search_patients_button = Render.search_patients_button()
+                    const month_year_div = document.createElement('div')
+                    month_year_div.setAttribute('class', 'flex w-fit pl-4 gap-5 mb-4 justify-between')
+                    month_year_div.appendChild(year_display)
+                    month_year_div.appendChild(month_display)   
+                    calendar_container.appendChild(month_year_div)
+                    calendar_container.appendChild(day_name_display)
+                    calendar_container.appendChild(calendar)
+                    calendar_container.appendChild(message)
+                    //calendar_container.appendChild(register_new_patient)
+                    //calendar_container.appendChild(search_patients_button)
+                    Run.calc_cal_height()
+                    MakeClickable.calendar()
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            }
+            const today = new Date()
+            get_month(today.getMonth()+1, today.getFullYear())
+        })
+    </script>
+    <style>
+        /*#body{
+            background-color: #d4d4d8;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='32' viewBox='0 0 60 96'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23a3a3a3' fill-opacity='0.4'%3E%3Cpath d='M36 10a6 6 0 0 1 12 0v12a6 6 0 0 1-6 6 6 6 0 0 0-6 6 6 6 0 0 1-12 0 6 6 0 0 0-6-6 6 6 0 0 1-6-6V10a6 6 0 1 1 12 0 6 6 0 0 0 12 0zm24 78a6 6 0 0 1-6-6 6 6 0 0 0-6-6 6 6 0 0 1-6-6V58a6 6 0 1 1 12 0 6 6 0 0 0 6 6v24zM0 88V64a6 6 0 0 0 6-6 6 6 0 0 1 12 0v12a6 6 0 0 1-6 6 6 6 0 0 0-6 6 6 6 0 0 1-6 6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }*/
+        /*#patient_details, #scheduled_view, #layout_view{
+            background-color: #9ca3af;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='105' viewBox='0 0 80 105'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='death-star' fill='%234b5563' fill-opacity='0.28'%3E%3Cpath d='M20 10a5 5 0 0 1 10 0v50a5 5 0 0 1-10 0V10zm15 35a5 5 0 0 1 10 0v50a5 5 0 0 1-10 0V45zM20 75a5 5 0 0 1 10 0v20a5 5 0 0 1-10 0V75zm30-65a5 5 0 0 1 10 0v50a5 5 0 0 1-10 0V10zm0 65a5 5 0 0 1 10 0v20a5 5 0 0 1-10 0V75zM35 10a5 5 0 0 1 10 0v20a5 5 0 0 1-10 0V10zM5 45a5 5 0 0 1 10 0v50a5 5 0 0 1-10 0V45zm0-35a5 5 0 0 1 10 0v20a5 5 0 0 1-10 0V10zm60 35a5 5 0 0 1 10 0v50a5 5 0 0 1-10 0V45zm0-35a5 5 0 0 1 10 0v20a5 5 0 0 1-10 0V10z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }*/
+    </style>
+{% endblock %}
+
+{% block content %}
+        <div id="error_div" class="fixed top-3 mx-auto z-50 inset-x-0 w-fit hidden"><div id="error_message" class=" bg-red-300 p-5">Failed to Delete</div></div>
+        <div id="back_button" back_to="" class="flex bg-[#F4F9FA]old bg-white mt-px py-5 pl-4 gap-2 hidden">
+            <div class="flex justify-center items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-no-shrink" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                </svg>
+            </div>
+            <span id="visible_text" class="font-semibold">Back to calendar</span>
+        </div>
+        <div id="page">
+        </div>
+        <div id="calendar_page" class="h-full">
+            <div id="calendar_container" class="my-px bg-[#F4F9FA]old bg-white pt-20 pb-12 px-2.5"></div>
+        </div>
+        <div id="session_times" class="my-px bg-[#F4F9FA]old bg-white hidden"></div>
+        <div id="appointment_options" class="hidden my-px bg-[#F4F9FA]old bg-white px-6 py-24 grid gap-8">
+            <div class="text-center">Appointment information</div>
+            <div id="schedule" class="button">Appointment</div>
+            <div id="payments_patient_container" class="button">Take payments for appointment</div>
+            <div id="view_layout" class="button">View layout of chamber</div>
+            <div class="text-center">Admin</div>
+            <div id="add_patients" class="button">Add patients to appointment</div>
+            <div id="panel_change" class="button">Assign panels for patients</div>
+            <div id="edit_layouts" class="button">Choose layout of chamber</div>
+        </div>
+        <div id="patient_details" class="">
+            <div id="scheduled_view" class="hidden"></div>
+            <div id="scheduled_view" class="pt-8 pb-6 text-center text-large hidden">People In Appointment</div>
+            <div id="booked_in_div" class="section mx-6 pb-7 grid gap-8 hidden"></div>
+            <div id="payments_div" class="section hidden grid gap-10 bg-[#EBF6F7]old bg-gray-50"></div>
+            <div id="panel_div" class="section hidden grid gap-10 bg-[#EBF6F7]old bg-gray-50"></div>  
+            <div id="book_in_view" class="section hidden my-px bg-[#EBF6F7]old bg-gray-50">
+                <!--<div class="pt-8 pb-6 text-center text-large">Book People In</div>-->
+                <div id="add_patient" class="mt-px"></div>
+            </div>
+            <div id="only_view_layout" class="section hidden pt-20 pb-20">
+                <div id="no_layout_container"class="my-20 mx-5 bg-[#F4F9FA]old bg-white flex justify-center items-center hidden rounded-sm shadow-md">
+                    <div class="italic text-center text-gray-500 p-10">No layout has been chosen</div>
+                </div>
+                <div id="yes_layout_container" class="mx-2 overflow-hidden hidden bg-[#F4F9FA]old bg-white rounded-sm shadow-md">
+                    <div id="layout_container" class=""></div>
+                    <div id="layout_caption" class="pt-2 pb-3 text-center px-3">Lay out the chamber as shown in the picture.</div>
+                </div>
+                </div>
+            <div id="layout_view" class="section hidden h-fit">
+                <!--div class="text-center text-large hidden">Chamber Layout</div>-->
+                <div id="current_layout_choice" class="hidden bg-[#F4F9FA]old bg-white  my-32 mx-1.5">
+                    <div id="layout_display" class="h-fit"></div>
+                    <div class="text-center text-semi py-2">This is the chosen layout.</div>
+                </div>
+                <div>
+                    <div id="layout_all" class="bg-[#EBF6F7]old bg-gray-50 h-fit grid gap-10 p-1 my-3"></div>
+                    <div id="layout_all_delete" class="h-80 overflow-y-scroll bg-stone-100 rounded-lg hidden mt-3"></div>
+                </div>
+                <div class="pb-7"></div>
+            </div>
+        </div>
+        <div style="display: none;">
+            <div id="appointment_times">
+                {% for sess in all_sessions%}
+                    <div class="appointment_time" id="{{sess.id}}">{{sess.time | date:"g:i a"}}</div>
+                {% endfor %}
+            </div>
+        <div id="session_json" style="display: none;">
+            {{sessions}}
+        </div>
+        </div>
+{% endblock %}

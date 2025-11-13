@@ -1,0 +1,631 @@
+{% extends "oxychai/layout.html" %}
+
+{% block head %}
+        <script>
+            window.addEventListener('DOMContentLoaded', ()=> {
+
+
+                const Styles = {
+                    buttonCorner: 'rounded-sm',
+                    //textNormal: 'text-xs font-normal',
+                    textNormal: 'text-xl font-normal',
+                    //textSemi: 'text-xs font-semibold',
+                    textSemi: 'text-xl font-semibold',
+                    textColor: 'text-gray-900',
+                    textWarning: 'text-red-500',
+                    textBold: 'text-xl font-bold',
+                    //textBold: 'text-xs font-bold',
+                    textTitle: 'text-3xl font-bold',
+                    textTitleSmall: 'text-2xl font-semibold',
+                    selectCorner: 'rounded-md',
+                    HierArchOne: 'text-3xl font-extrabold',
+                    HierArchTwo: 'text-2xl font-semibold',
+                    HierArchThree: 'text-xl font-medium',
+                    //HierArchThree: 'text-xs font-medium',
+                }
+                const Page = {
+                    Layer1: 'bg-stone-600',
+                    Layer2: 'bg-stone-500',
+                    Layer3: 'bg-stone-300'
+                }
+                const oxyBlue = 'bg-[#70C4D7]'
+                const oxySecondry = 'bg-[#70C4D761]'
+                const oxyTertiary = 'bg-[#70C4D733]'
+                const oxyColorOutline = 'outline-[#70C4D7]'
+                /*const OxyButton = function(text, extra_classes){
+                    const button = document.createElement('div')
+                    button.setAttribute('class', `${Styles.textSemi} ${Styles.textColor} ${Styles.buttonCorner} pt-6 pb-6 ${extra_classes}`)
+                    button.innerHTML = text
+                    return button
+                }*/
+                document.getElementsByTagName('body')[0].setAttribute('class', `${Styles.textColor} ${Styles.textNormal} bg-gray-700`);
+                //title
+                const titles = document.querySelectorAll('.text_title');
+                console.log(titles)
+                titles.forEach( (title) => {
+                    const existing_classes = title.getAttribute('class');
+                    title.setAttribute('class', `${existing_classes} ${Styles.textTitle}`);
+                });
+                //title small
+                const title_smalls = document.querySelectorAll('.text_title_sm'); 
+                title_smalls.forEach( (title) => {
+                    const existing_classes = title.getAttribute('class');
+                    title.setAttribute('class', `${existing_classes} ${Styles.textTitleSmall} my-8 py-2 sticky top-0 bg-gray-50`);
+                });
+                //text semi
+                const text_semi = document.querySelectorAll('.text_semi');
+                text_semi.forEach( (text) => {
+                    const existing_classes = text.getAttribute('class');
+                    text.setAttribute('class', `${existing_classes} ${Styles.textSemi}`);
+                });
+                //inputs
+                const inputs = document.querySelectorAll('.input');
+                inputs.forEach((input) => {
+                    input.setAttribute('class', `${Styles.textNormal} ${Styles.textColor} w-full pt-[12px] pb-[12px] pl-3.5 border border-gray-300 bg-gray-200 border-2 rounded-md onfocus:outline ${oxyColorOutline} outline-offset-4`);
+                });
+                //note
+                const existing_classes = document.getElementsByTagName('textarea')[0]?.classList
+                document.getElementsByTagName('textarea')[0]?.setAttribute('class', `${existing_classes} ${Styles.textNormal} ${Styles.textColor} w-full p-2 bg-gray-200 border border-gray-300 border-2 rounded-md onfocus:outline ${oxyColorOutline} outline-offset-4 h-32`);
+                //select
+                const selects = document.querySelectorAll('.select');
+                selects.forEach((select) => {
+                    select.setAttribute('class', `${Styles.textNormal} ${Styles.textColor} pt-[8px] pb-[8px] pl-2 bg-white outline ${oxyColorOutline} rounded-xs`);
+                }); 
+                //submit
+                document.getElementById('register').setAttribute('class', `${Styles.textSemi} ${Styles.textColor} ${Styles.buttonCorner} pt-[10px] pb-[10px] w-full ${oxyBlue}`);
+                
+                function s_response(message){
+                    document.getElementById("server_response").innerHTML = message;
+                    document.getElementById("server_response").classList.remove('hidden');
+                }
+                function convert_cost_to_pennys(amount){
+                    //i.e if there s a decimal point
+                    if(amount.search(/\./) > 1){
+                        const decimal_index = amount.search(/\./)
+                        const pounds = amount.substring(0, decimal_index)
+                        const pennys = amount.substring(decimal_index + 1)
+                        if(pennys.length >= 2){
+                            return parseInt(pounds + pennys.substring(0, 2))
+                        }
+                        else if(pennys.length === 1){
+                            return parseInt(pounds + pennys + '0')
+                        }
+                        else{
+                            return parseInt(pounds + '00')
+                        }
+                    }
+                    else{
+                        return parseInt(amount) * 100
+                    }
+                }
+
+                function capitalize_name(name){
+                    let name_c
+                    name_split = name.match(/[a-zA-Z'-]+/g);
+                    console.log(name_split)
+                    for(let i = 0; i < name_split.length; i++){
+                        //capitalize first letters
+                        let capitlised = name_split[i].charAt(0).toUpperCase() + String(name_split[i]).slice(1);
+                        if(name_c){
+                            name_c = name_c + ' ' + capitlised
+                        }
+                        else{
+                            name_c = capitlised
+                        }
+                    }
+                    name_c = name_c.trim()
+                    return name_c
+                }
+                function get_data(){
+                    const id = document.getElementById('patient_id').getAttribute('value');
+                    let first_name
+                    let last_name
+                    let name = document.getElementById("name").value;
+                    if(!name){
+                        return false;
+                    }
+                    let name_c
+                    if(name){
+                        name = name.trim();
+                        //capitalize first letters
+                        if(name){
+                            name = capitalize_name(name)
+                        }
+                        console.log('->', name)
+                        if(name.includes(" ")){
+                            first_name = name.substring(0, name.indexOf(" ")).trim();
+                            last_name = name.substring(name.indexOf(" ")).trim();
+                        }
+                        else {
+                            first_name = name;
+                            last_name = null;
+                        }
+                    }
+                    else {
+                        first_name = null;
+                        last_name = null;
+                    }
+                    //gender
+                    let gender
+                    document.querySelectorAll('.gender').forEach( (radio) => {
+                        if(radio.checked){
+                            gender = radio.value;
+                        }
+                    });
+                    if(!gender){
+                        gender = null;
+                    }
+                    //age
+                    let age
+                    if(document.getElementById("age").value){
+                        age = document.getElementById("age").value;
+                    } else {
+                        age = null;
+                    }
+
+                    let req_sessions
+                    if(document.getElementById('sessions').value){
+                        req_sessions = document.getElementById('sessions').value;
+                    }
+                    else{
+                        req_sessions = null
+                    }
+
+                    let email
+                    if(document.getElementById("email").value){
+                        email = document.getElementById("email").value;
+                    } else {
+                        email = null;
+                    }
+
+                    let phone
+                    if(document.getElementById("phone").value){
+                        phone = document.getElementById("phone").value;
+                    } else {
+                        phone = null;
+                    }
+                    let cost
+                    if(document.getElementById("price").value){
+                        cost = document.getElementById("price").value;
+                        cost = convert_cost_to_pennys(cost);
+                    } else {
+                        cost = null;
+                    }
+
+                    let depth
+                    document.querySelectorAll('.depth').forEach( (radio) => {
+                        if(radio.checked){
+                            depth = radio.value;
+                        }
+                    });
+                    if(!depth){
+                        depth = null;
+                    }
+
+                    let mask
+                    document.querySelectorAll('.mask').forEach( (radio) => {
+                        if(radio.checked){
+                            mask = radio.value;
+                        }
+                    });
+                    if(!mask){
+                        mask = null;
+                    }
+
+                    let pipe_length
+                    document.querySelectorAll('.pipe_length').forEach( (radio) => {
+                        if(radio.checked){
+                            pipe_length = radio.value;
+                        }
+                    });
+                    if(!pipe_length){
+                        pipe_length = null;
+                    }
+
+                    let size
+                    document.querySelectorAll('.size').forEach( (radio) => {
+                        if(radio.checked){
+                            size = radio.value
+                        }
+                    })
+                    // Check hood size select if no radio button size is selected
+                    if(!size){
+                        const hoodSelect = document.getElementById("hood_size");
+                        if(hoodSelect && hoodSelect.value){
+                            size = hoodSelect.value;
+                        }
+                    }
+                    if(!size){
+                        size = null;
+                    }
+
+                    let note
+                    if(document.getElementById("note").value){
+                        note = document.getElementById("note").value;
+                    } else {
+                        note = null;
+                    }
+                    let carer;
+                    if(document.getElementById("carer").checked){
+                        carer = true;
+                    } else {
+                        carer = null;
+                    }
+                    let extras = [];
+                    document.querySelectorAll('.extras:checked').forEach((checkbox) => {
+                        extras.push(checkbox.value);
+                    });
+                    if(extras.length === 0){
+                        extras = null;
+                    }
+                    return {
+                        'id':id,
+                        'first_name':first_name,
+                        'last_name':last_name,
+                        'gender':gender,
+                        'age':age,
+                        'req_sessions':req_sessions,
+                        'email':email,
+                        'phone':phone,
+                        'cost':cost,
+                        'depth':depth,
+                        'mask':mask,
+                        'pipe_length':pipe_length,
+                        'size':size,
+                        'note':note,
+                        'carer':carer,
+                        'extras':extras
+                    }
+                }
+                // Collect form data
+                document.getElementById("register").addEventListener('click', function() {
+
+                    const csrf = document.getElementsByName("csrfmiddlewaretoken")[0]?.value;
+                    let data = get_data();
+                    console.log(data)
+                    if(!data){
+                        s_response('Name is required');
+                        return;
+                    }
+                    // Send data to the server
+                    fetch('/editDetails/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(response => {
+                        console.log(response)
+                        if (response.ok) {
+
+                            s_response('Updated successfully.');
+                            // Optionally, redirect or clear the form
+                        } else {
+                            s_response('Update failed.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        s_response('An error occurred.');
+                    });
+                });
+                /*var form = document.getElementById("form_one");
+                document.getElementById("back_arrow").addEventListener("click", function () {
+                    form.submit();
+                });*/
+
+                // Breathing Apparatus Size Management
+                // This manages which sizing section is enabled based on the selected breathing apparatus
+                
+                // Get all sizing section containers
+                const maskSizesContainer = document.getElementById('mask-sizes-container');
+                const hoodSizesContainer = document.getElementById('hood-sizes-container');
+                const tracheaSizesContainer = document.getElementById('trachea-sizes-container');
+                
+                // Function to disable all size inputs in a container
+                function disableContainer(container) {
+                    if (!container) return;
+                    const inputs = container.querySelectorAll('input, select');
+                    inputs.forEach(input => {
+                        input.disabled = true;
+                        input.checked = false;
+                        input.classList.add('opacity-50', 'cursor-not-allowed');
+                        if (input.tagName === 'SELECT') {
+                            input.value = '';
+                        }
+                    });
+                    // Also gray out the labels for individual options
+                    const labels = container.querySelectorAll('label');
+                    labels.forEach(label => {
+                        label.classList.add('opacity-50', 'cursor-not-allowed');
+                    });
+                }
+                
+                // Function to enable all size inputs in a container
+                function enableContainer(container) {
+                    if (!container) return;
+                    const inputs = container.querySelectorAll('input, select');
+                    inputs.forEach(input => {
+                        input.disabled = false;
+                        input.classList.remove('opacity-50', 'cursor-not-allowed');
+                    });
+                    // Remove gray from labels
+                    const labels = container.querySelectorAll('label');
+                    labels.forEach(label => {
+                        label.classList.remove('opacity-50', 'cursor-not-allowed');
+                    });
+                }
+                
+                // Function to update size availability based on selected breathing apparatus
+                function updateSizeAvailability(maskId) {
+                    // Disable all containers first
+                    disableContainer(maskSizesContainer);
+                    disableContainer(hoodSizesContainer);
+                    disableContainer(tracheaSizesContainer);
+                    
+                    // Enable the appropriate container based on mask ID
+                    // 1: Mask - enable mask sizes
+                    // 2: Hood - enable hood sizes
+                    // 3: Mouthpiece - no sizes needed
+                    // 4: Trachea mask - enable trachea sizes
+                    
+                    if (maskId === '1') {
+                        enableContainer(maskSizesContainer);
+                    } else if (maskId === '2') {
+                        enableContainer(hoodSizesContainer);
+                    } else if (maskId === '4') {
+                        enableContainer(tracheaSizesContainer);
+                    }
+                    // For Mouthpiece (3), all containers remain disabled
+                }
+                
+                // Add event listeners to all breathing apparatus radio buttons
+                const maskRadios = document.querySelectorAll('.mask');
+                maskRadios.forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        if (this.checked) {
+                            updateSizeAvailability(this.value);
+                        }
+                    });
+                });
+                
+                // Initialize: disable all size sections on page load
+                /*disableContainer(maskSizesContainer);
+                disableContainer(hoodSizesContainer);
+                disableContainer(tracheaSizesContainer);*/
+
+                // Pre-fill form with existing other_info data
+                const other_info = JSON.parse(document.getElementById('other_info').innerText);
+                console.log(other_info)
+                const depth = other_info.depth;
+                const mask = other_info.mask;
+                const pipe_length = other_info.pipe_length;
+                const sizeId = other_info.sizeId;
+                const extras = other_info.extras;
+                // Set previously selected depth
+                if(depth){
+                    const depthRadio = document.querySelector(`.depth[value='${depth}']`);
+                    depthRadio.checked = true;
+                }
+                // Set previously selected mask
+                if(mask){
+                    const maskRadio = document.querySelector(`.mask[value='${mask}']`);
+                    maskRadio.checked = true;
+                }
+                // Set previously selected pipe length
+                if(pipe_length){
+                    const pipeLengthRadio = document.querySelector(`.pipe_length[value='${pipe_length}']`);
+                    pipeLengthRadio.checked = true;
+                }
+                // Set previously selected size
+                const selected_mask = document.querySelector(`.mask:checked`).nextElementSibling.innerText;
+                if(selected_mask){
+                    if(selected_mask === 'Mask'){
+                        console.log(selected_mask)
+                        const sizeRadio = document.querySelector(`.mask-size[value='${sizeId}']`);
+                        sizeRadio.checked = true;
+                        disableContainer(hoodSizesContainer);
+                        disableContainer(tracheaSizesContainer);
+                    }
+                    else if(selected_mask === 'Hood'){
+                        const hoodSelect = document.getElementById('hood_size');
+                        hoodSelect.value = sizeId;
+                        disableContainer(maskSizesContainer);
+                        disableContainer(tracheaSizesContainer);
+                    }
+                    else if(selected_mask === 'Trachea mask'){
+                        const sizeRadio = document.querySelector(`.trachea-size[value='${sizeId}']`);
+                        sizeRadio.checked = true;
+                        disableContainer(maskSizesContainer);
+                        disableContainer(hoodSizesContainer);
+                    }
+                    else{
+                        //mouthpiece selected - disable all sizing
+                        disableContainer(maskSizesContainer);
+                        disableContainer(hoodSizesContainer);
+                        disableContainer(tracheaSizesContainer);
+                    }
+                }
+                //set extras
+                if(extras){
+                    extras.forEach( (ex) => {
+                        const extraCheckbox = document.querySelector(`.extras[value='${ex}']`);
+                        extraCheckbox.checked = true;
+                    });
+                }
+                
+            });
+        </script>  
+{% endblock %}
+
+
+{% block content %}
+<a href="/searchPatients"><div id="back_button" back_to="" class="flex bg-gray-50old bg-white mt-px py-5 pl-4 gap-2">
+    <div class="flex justify-center items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-no-shrink" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+        </svg>
+    </div>
+    <span id="visible_text" class="font-semibold">Back to search patients</span>
+</div></a>
+<div class="my-px bg-gray-50old bg-white px-4">
+    <div class="text text_title text-center pt-12 w-">Edit Patient Details</div>
+    <div class="">
+        <div class="text_title_sm text-center z-10">Personal details</div>
+        <div class="">
+            <div class="mb-8">
+                <div class="mb-3 text_semi">Name</div>
+                <input type="text" id="name" class="input" autocomplete="do-not-autofill" value="{{ details.first_name }} {{ details.last_name }}" autocomplete="false" placeholder="John Doe"/>
+            </div>
+            <div class="mb-8">
+                <div class="text_semi mb-3 ">Gender</div>
+                <div class="grid gap-3">
+                    <div class="flex gap-0.5">
+                        {% if details.gender == 'male' %}
+                        <input class="gender peer" type="radio" name="gender" value="male" id="gender-male" checked>
+                        {% else %}
+                        <input class="gender peer" type="radio" name="gender" value="male" id="gender-male">
+                        {% endif %}
+                        <label for="gender-male" class="text">Male</label>
+                    </div>
+                    <div class="flex gap-0.5">
+                        {% if details.gender == 'female' %}
+                        <input class="gender peer" type="radio" name="gender" value="female" id="gender-female" checked>
+                        {% else %}
+                        <input class="gender peer" type="radio" name="gender" value="female" id="gender-female">
+                        {% endif %}
+                        <label for="gender-female" class="text">Female</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-8">
+                <div class="mb-3 text_semi">Age</div>
+                <input type="number" id="age" class="input" value="{{ details.age }}" autocomplete="do-not-autofill" placeholder="1"/>
+            </div>
+            <div class="mb-8">
+                <div class="mb-3 text_semi">Carer</div>
+                <div class="flex gap-0.5">
+                    {% if details.carer %}
+                    <input type="checkbox" class="peer" id="carer" checked>
+                    {% else %}
+                    <input type="checkbox" class="peer" id="carer">
+                    {% endif %}
+                    <label for="carer" class="">This person has a carer.</label>
+                </div>
+            </div>
+            <div class="mb-8">
+                <div class="mb-3 text_semi">Required Sessions</div>
+                <input type="number" id="sessions" class="input" value="{{ details.req_sess }}" autocomplete="do-not-autofill" placeholder="1"/>
+            </div>
+            <div class="mb-8">
+                <div class="mb-3 text_semi">Email</div>
+                <input type="text" id="email" class="input" value="{{ details.email }}" autocomplete="do-not-autofill" placeholder="john@example.com"/>
+            </div>
+            <div class="mb-8">
+                <div class="mb-3 text_semi">Phone</div>
+                <input type="number" id="phone" class="input" value="{{ details.phone }}" autocomplete="do-not-autofill" placeholder="phonenumber"/>
+            </div>
+            <div class="mb-8">
+                <div class="mb-3 text_semi">Price</div>
+                <input type="number" id="price" class="input" value="{{ details.cost }}" autocomplete="do-not-autofill" placeholder="0.00"/>
+            </div>
+            <div class="mb-8">
+                <div class="text_semi mb-3">Note</div>
+                <textarea maxlength="500" id="note" class="note w-full h-32" placeholder="Add note...">{{ details.note }}</textarea>
+            </div>
+        </div>
+    </div>
+        <!--<div class="mt-12 h-16 w-full bg-gray-100"></div>-->
+        <div class="">
+            <div class="text_title_sm text-center z-10">Appointment requirements</div>
+            <div class="">
+                <div class="mb-8">
+                    <div class="text_semi mb-3 ">Depth</div>
+                    <div class="grid gap-3 ">
+                    {% for depth in depths %}
+                        <div class="flex gap-0.5">
+                            <input class="depth peer" type="radio" name="depth" value="{{ depth.id }}" id="depth-{{ depth.id }}">
+                            <label for="depth-{{ depth.id }}" class="text">{{ depth.depth }}msw</label>
+                        </div>
+                    {% endfor %}
+                </div>
+                </div>
+                <div class="mb-8">
+                    <div class="text_semi mb-3">Breathing Apparatus</div>
+                    <div class="grid gap-3">
+                        {% for mask in masks %}
+                            <div class="flex gap-0.5">
+                                <input class="mask peer" type="radio" name="mask" value="{{ mask.id }}" id="mask-{{ mask.id }}">
+                                <label for="mask-{{ mask.id }}" class="text">{{ mask.mask }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="mb-8">
+                    <div class="text_semi mb-3">Pipe Length</div>
+                    <div class="grid gap-3">
+                    {% for len in pipe_lengths %}
+                        <div class="flex gap-0.5">
+                            <input class="pipe_length peer" type="radio" name="pipe_length" value="{{ len.id }}" id="pipe_length-{{ len.id }}">
+                            <label for="pipe_length-{{ len.id }}" class="text">{{ len.length }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+                </div>
+                <div class="mb-8">
+                    <div class="text_semi mb-4">Sizing</div>
+                </div>
+                <div class="mb-8 pl-3" id="mask-sizes-container">
+                    <div class="text_semi mb-3">Mask Sizes</div>
+                    <div class="grid gap-3">
+                    {% for size in mask_sizes %}
+                        <div class="flex gap-0.5">
+                            <input class="size peer mask-size" type="radio" name="size" value="{{ size.id }}" id="size-{{ size.id }}">
+                            <label for="size-{{ size.id }}" class="text">{{ size.size_full }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+                </div>
+                <div class="mb-8 pl-3" id="hood-sizes-container">
+                    <div class="text_semi mb-3">Hood Sizes</div>
+                    <select id="hood_size" class="select">
+                        <option value="">Select hood size</option>
+                        {% for size in hood_sizes %}
+                            <option value="{{ size.id }}">{{ size.size }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="h- mb-8 pl-3" id="trachea-sizes-container">
+                    <div class="text_semi mb-3">Trachea Sizes</div>
+                    <div class="grid gap-3">
+                    {% for size in trachea_sizes %}
+                        <div class="flex gap-0.5">
+                            <input class="size peer trachea-size" type="radio" name="size" value="{{ size.id }}" id="sizeT-{{ size.id }}">
+                            <label for="sizeT-{{ size.id }}" class="text">{{ size.size }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+                </div>
+                <div class="mb-8">
+                    <div class="text_semi mb-3">Items</div>
+                    <div class="grid gap-3">
+                    {% for ex in extras %}
+                        <div class="flex gap-0.5">
+                            <input class="extras peer" type="checkbox" name="extras" value="{{ ex.id }}" id="extras-{{ ex.id }}">
+                            <label for="extras-{{ ex.id }}" class="text">{{ ex.item }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+                </div>
+            </div>
+        </div>
+        <div class="pt-8 pb-10">
+            <div id="server_response" class="mb-2 bg-gray-400 w-full pt-1 pb-1 pr-3 pl-3 hidden"></div>
+            <div><button id="register" class="">Save Changes</button></div>
+        </div>
+</div>
+<span class="hidden" id="other_info">{{ other_info }}</span>
+<span class="hidden" id="patient_id" value="{{ details.id }}"></span>
+{% endblock %}

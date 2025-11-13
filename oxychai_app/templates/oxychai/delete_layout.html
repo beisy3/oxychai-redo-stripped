@@ -1,0 +1,70 @@
+{% extends "oxychai/layout.html" %}
+
+{% block head %}
+<script>
+    window.addEventListener('DOMContentLoaded', ()=>{
+        const layout_delete_buttons = document.querySelectorAll('.select_n_layout')
+        layout_delete_buttons.forEach((btn)=>{
+            btn.addEventListener('click', ()=>{
+                const layout_id = btn.getAttribute('value')
+                const spinner = btn.querySelector('.animate-spin')
+                const button_text = btn.querySelector('span')
+                console.log(spinner)
+                const csrf = document.getElementsByName("csrfmiddlewaretoken")[0]?.value
+                const xhttp = new XMLHttpRequest();
+                xhttp.open("POST", "/deleteLayout/");
+                xhttp.setRequestHeader('X-CSRFToken', csrf)
+                xhttp.onreadystatechange = async function() {
+                    if (this.readyState === 4 && this.status === 200) {
+                        spinner.classList.add('hidden')
+                        button_text.innerHTML = 'Layout Deleted!'
+                        button_text.classList.remove('hidden')
+                        btn.classList.remove('bg-red-500')
+                        btn.classList.add('bg-red-500/50')
+                        await delay(3000);
+                        const layout_cont = document.querySelector(`[image_id='${layout_id}']`)
+                        layout_cont.remove();
+                    }
+                    else if (this.readyState === 4 && this.status !== 200) {
+                        show_error('Failed to delete Layout.');
+                        spinner.classList.add('hidden')
+                    }
+                };
+                const form = {'layout_id': layout_id}
+                xhttp.send(JSON.stringify(form));
+                console.log('loading')
+                spinner.classList.remove('hidden')
+                button_text.classList.add('hidden')
+            })
+        })
+    })
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="bg-gray-400 py-px">
+<div class="bg-gray-50old bg-white flex place-items-center justify-center sticky top-0 z-10 gap-3 px-2 py-4 ">
+    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-red-600 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5"  class="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+    </svg>
+    <span class="text-red-600">Beware you are on the delete layout page</span></div>
+<div id="all_layouts" class="h-fit grid gap-11 p-1 mx-5 py-3">
+    {% for lay in layouts %}
+        <div image_id="{{ lay.id }}" class="pt-1.5 px-1.5 bg-gray-50 rounded-md flex flex-col items-center">
+            <div class="pt-1.5 px-1.5 bg-gray-50 rounded-md flex flex-col items-center">
+                <img src="{{ lay.layout }}" alt="Image unavailable" width="auto">
+                <div value="{{ lay.id }}" class="flex-1 h-5 text-xl font-semibold rounded-sm pt-[10px] pb-[10px] select_n_layout w-[90%] mt-1.5 mb-1.5 min-h-12 text-center flex justify-center bg-red-500"  value="58">
+                    <div class="animate-spin w-fit h-fit hidden">
+                        <svg width="27" height="27" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M30 3.75V10.5C33.8567 10.5 37.6269 11.6437 40.8336 13.7863C44.0404 15.929 46.5397 18.9745 48.0157 22.5377C49.4916 26.1008 49.8777 30.0216 49.1253 33.8043C48.3729 37.5869 46.5157 41.0615 43.7886 43.7886C41.0615 46.5157 37.5869 48.3729 33.8043 49.1253C30.0216 49.8777 26.1008 49.4916 22.5377 48.0157C18.9745 46.5397 15.929 44.0404 13.7863 40.8336C11.6437 37.6269 10.5 33.8567 10.5 30H3.75C3.75 35.1918 5.28954 40.2669 8.17392 44.5837C11.0583 48.9005 15.158 52.265 19.9546 54.2518C24.7511 56.2386 30.0291 56.7585 35.1211 55.7456C40.2131 54.7328 44.8904 52.2327 48.5616 48.5616C52.2327 44.8904 54.7328 40.2131 55.7456 35.1211C56.7585 30.0291 56.2386 24.7511 54.2518 19.9546C52.265 15.158 48.9005 11.0583 44.5837 8.17392C40.2669 5.28954 35.1918 3.75 30 3.75Z" fill="black"/>
+                        </svg>
+                    </div>
+                    <span>Delete this layout</span>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+</div>
+
+{% endblock %}
