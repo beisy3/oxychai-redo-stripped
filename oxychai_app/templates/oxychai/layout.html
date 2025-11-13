@@ -37,7 +37,7 @@
         
         window.addEventListener('DOMContentLoaded', ()=>{
 
-            document.getElementById('shell').setAttribute('class', `h-fit bg-gray-900 ${Styles.textNormal} ${Styles.textColor}`)
+            document.getElementById('shell').setAttribute('class', `h-fit bg-gray-100 ${Styles.textNormal} ${Styles.textColor}`)
             const Page = {
                 Layer1: 'bg-stone-600',
                 Layer2: 'bg-stone-500',
@@ -78,8 +78,8 @@
             const page = document.getElementById('page')
             const menu = document.getElementById('menu')
             const menu_options = document.getElementById('slide_out_menu')
-            menu_options.setAttribute('class', 'bg-gray-100 absolute -translate-x-full top-[88px] pt-2 z-70 w-full h-full')
-            const old_classes = 'bg-gray-100 absolute top-[88px] pt-2 z-70 w-full h-full'
+            const old_classes = ' bg-gray-300 absolute top-[88px] lg:hidden pt-2 z-70 w-full md:w-100 h-full'
+            menu_options.setAttribute('class', `${old_classes} -translate-x-full`)
             menu.addEventListener('click', ()=>{
                 if(!menu_options.classList.contains('-translate-x')){
                     console.log('role in')
@@ -96,29 +96,37 @@
     {% block head %}{% endblock %}
 </head>
 <body id="shell" data-theme="light" class="">
-    <div id="body" class="min-h-screen relative max-w-[460px] m-auto bg-[#A8BEC2]old  bg-gray-400">
+    <div class="w-full flex items-center gap-6 pt-4 pb-4 pl-4 lg:pr-4 bg-gray-50old bg-white">
+    <button id="menu" class="lg:hidden peer bg-[#5BCBD6] p-3 rounded-sm focus:outline-none" tabindex="0">
+        <svg width="48" height="32" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2.66668 32C1.91112 32 1.27823 31.744 0.76801 31.232C0.257787 30.72 0.00178697 30.0871 9.19539e-06 29.3333C-0.00176858 28.5796 0.254232 27.9467 0.76801 27.4347C1.28179 26.9227 1.91468 26.6667 2.66668 26.6667H45.3333C46.0889 26.6667 46.7227 26.9227 47.2347 27.4347C47.7467 27.9467 48.0018 28.5796 48 29.3333C47.9982 30.0871 47.7422 30.7209 47.232 31.2347C46.7218 31.7484 46.0889 32.0036 45.3333 32H2.66668ZM2.66668 18.6667C1.91112 18.6667 1.27823 18.4107 0.76801 17.8987C0.257787 17.3867 0.00178697 16.7538 9.19539e-06 16C-0.00176858 15.2462 0.254232 14.6133 0.76801 14.1013C1.28179 13.5893 1.91468 13.3333 2.66668 13.3333H45.3333C46.0889 13.3333 46.7227 13.5893 47.2347 14.1013C47.7467 14.6133 48.0018 15.2462 48 16C47.9982 16.7538 47.7422 17.3876 47.232 17.9013C46.7218 18.4151 46.0889 18.6702 45.3333 18.6667H2.66668ZM2.66668 5.33333C1.91112 5.33333 1.27823 5.07733 0.76801 4.56533C0.257787 4.05333 0.00178697 3.42044 9.19539e-06 2.66667C-0.00176858 1.91289 0.254232 1.28 0.76801 0.768C1.28179 0.256 1.91468 0 2.66668 0H45.3333C46.0889 0 46.7227 0.256 47.2347 0.768C47.7467 1.28 48.0018 1.91289 48 2.66667C47.9982 3.42044 47.7422 4.05422 47.232 4.568C46.7218 5.08178 46.0889 5.33689 45.3333 5.33333H2.66668Z" fill="#F9FAFB"/>
+        </svg>
+    </button>
+    <div class="">
+        <img class="h-13" src='/static/oxychailogo.jpg' alt="oxychai logo">
+    </div>
+    <div class="flex gap-2 justify-between w-full text-[#5BCBD6] font-medium max-lg:hidden">
+        <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/">Oxychai's calendar</a>
+        <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/registerNew/">Register patient</a>
+        <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/searchPatients/">Search patients</a>
+        <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/saveLayout/">Upload layout</a>
+        <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/deleteLayout/">Delete layout</a>  
+    </div>
+</div>
+    <div id="slide_out_menu" class="hidden">
+        <div class="grid">
+            <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/">Oxychai's calendar</a>
+            <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/registerNew/">Register patient</a>
+            <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/searchPatients/">Search patients</a>
+            <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/saveLayout/">Upload layout</a>
+            <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/deleteLayout/">Delete layout</a>
+            <!--<a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white">SignIn</a>-->
+        </div>
+    </div>
+    <div id="body" class="min-h-screen relative max-w-[460px] lg:max-w-[404px] m-auto bg-[#A8BEC2]old shadow-sm  bg-gray-300">
         <div id="csrf" hidden>{% csrf_token %}</div> 
 
-        <div class="w-full flex items-center gap-6 pt-4 pb-4 pl-4 bg-gray-50old bg-white">
-            <button id="menu" class="peer bg-[#5BCBD6] p-3 rounded-sm focus:outline-none" tabindex="0">
-                <svg width="48" height="32" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M2.66668 32C1.91112 32 1.27823 31.744 0.76801 31.232C0.257787 30.72 0.00178697 30.0871 9.19539e-06 29.3333C-0.00176858 28.5796 0.254232 27.9467 0.76801 27.4347C1.28179 26.9227 1.91468 26.6667 2.66668 26.6667H45.3333C46.0889 26.6667 46.7227 26.9227 47.2347 27.4347C47.7467 27.9467 48.0018 28.5796 48 29.3333C47.9982 30.0871 47.7422 30.7209 47.232 31.2347C46.7218 31.7484 46.0889 32.0036 45.3333 32H2.66668ZM2.66668 18.6667C1.91112 18.6667 1.27823 18.4107 0.76801 17.8987C0.257787 17.3867 0.00178697 16.7538 9.19539e-06 16C-0.00176858 15.2462 0.254232 14.6133 0.76801 14.1013C1.28179 13.5893 1.91468 13.3333 2.66668 13.3333H45.3333C46.0889 13.3333 46.7227 13.5893 47.2347 14.1013C47.7467 14.6133 48.0018 15.2462 48 16C47.9982 16.7538 47.7422 17.3876 47.232 17.9013C46.7218 18.4151 46.0889 18.6702 45.3333 18.6667H2.66668ZM2.66668 5.33333C1.91112 5.33333 1.27823 5.07733 0.76801 4.56533C0.257787 4.05333 0.00178697 3.42044 9.19539e-06 2.66667C-0.00176858 1.91289 0.254232 1.28 0.76801 0.768C1.28179 0.256 1.91468 0 2.66668 0H45.3333C46.0889 0 46.7227 0.256 47.2347 0.768C47.7467 1.28 48.0018 1.91289 48 2.66667C47.9982 3.42044 47.7422 4.05422 47.232 4.568C46.7218 5.08178 46.0889 5.33689 45.3333 5.33333H2.66668Z" fill="#F9FAFB"/>
-                </svg>
-            </button>
-            <div class="">
-                <img class="h-13" src='/static/oxychailogo.jpg' alt="oxychai logo">
-            </div>
-        </div>
-            <div id="slide_out_menu" class="hidden">
-                <div class="grid">
-                    <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/">Oxychai's calendar</a>
-                    <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/registerNew/">Register patient</a>
-                    <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/searchPatients/">Search patients</a>
-                    <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/saveLayout/">Upload layout</a>
-                    <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/deleteLayout/">Delete layout</a>
-                    <!--<a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white">SignIn</a>-->
-                </div>
-            </div>
+
 
 
         {% block content %}{% endblock %}
@@ -126,6 +134,6 @@
         <div id="error_div" class="fixed top-3 mx-auto z-100 inset-x-0 w-fit hidden"><div id="error_message" class=" bg-red-300 p-5">Failed to Delete</div></div>
     </div>
     </div>  
-    <div class="w-full h-20 bg-gray-50old bg-white max-w-[460px] m-auto"></div>
+    <div class="w-full h-20 bg-gray-50old bg-white m-auto"></div>
     </body>
 </html>
