@@ -151,7 +151,7 @@ class Appointment(models.Model):
     dateID = models.ForeignKey(Calendar, on_delete=models.PROTECT)
     patientID = models.ForeignKey(patient, on_delete=models.CASCADE)
     sessionTime = models.ForeignKey(Time, on_delete=models.PROTECT)
-    panelPosition = models.CharField(null=True)
+    panelPosition = models.CharField(max_length=10, null=True)
     appointmentStatus = models.CharField(
         max_length=4,
         #choices=APPOINTMENT_STATUS_OPTIONS,
