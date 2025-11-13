@@ -42,21 +42,8 @@
             })
 
         </script>
+        {% block title %}{{ patient_info.first_name }} {{ patient_info.last_name }}'s Profile{% endblock %}
 {% endblock %}
-    <!--<body data-theme="light" class="bg-gray-700">
-        {% csrf_token %}
-        <div class="w-[320px] m-auto bg-gray-50 text-zinc-900 text-xl">
-            <div class="w-full flex justify-between items-center pt-4 pb-4 pr-2 pl-2 bg-stone-700">
-                <div>
-                    <img src='/static/oxychai-logo-no-bg.png' alt="oxychai logo" width="80">
-                </div>
-                <div class="text-zinc-100 flex gap-2 text-xs">
-                    <a href="/">Calendar</a>
-                    <a href="/registerNew">Register</a>
-                    <a href="/searchPatients">Search</a>
-                    <a>SignIn</a>
-                </div>
-            </div>-->
     {% block content %}
                 <a href="/searchPatients"><div id="back_button" back_to="" class="flex bg-gray-50old bg-white mt-px py-5 pl-4 gap-2">
                 <div class="flex justify-center items-center">

@@ -4,7 +4,8 @@
 <html class="min-h-screen" lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Calendar</title>
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="icon" type="image/x-icon" href="/static/oxychai-logo-no-name-no-bg.png">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     {% tailwind_css %}
@@ -76,8 +77,8 @@
             const page = document.getElementById('page')
             const menu = document.getElementById('menu')
             const menu_options = document.getElementById('slide_out_menu')
-            menu_options.setAttribute('class', 'bg-gray-100 absolute -translate-x-[404px] top-[88px] pt-2 z-70 w-[404px] h-full')
-            const old_classes = 'bg-gray-100 absolute top-[88px] pt-2 z-70 w-[404px] h-full'
+            menu_options.setAttribute('class', 'bg-gray-100 absolute -translate-x-full top-[88px] pt-2 z-70 w-full h-full')
+            const old_classes = 'bg-gray-100 absolute top-[88px] pt-2 z-70 w-full h-full'
             menu.addEventListener('click', ()=>{
                 if(!menu_options.classList.contains('-translate-x')){
                     console.log('role in')
@@ -86,7 +87,7 @@
                 }
                 else{
                     console.log('role out')
-                    menu_options.setAttribute('class', `${old_classes} transition duration-600 -translate-x-[404px]`)
+                    menu_options.setAttribute('class', `${old_classes} transition duration-600 -translate-x-full`)
                 }
             })
         })
@@ -94,7 +95,7 @@
     {% block head %}{% endblock %}
 </head>
 <body id="shell" data-theme="light" class="">
-    <div id="body" class="min-h-screen relative max-w-[404px] m-auto bg-[#A8BEC2]old  bg-gray-400">
+    <div id="body" class="min-h-screen relative max-w-[460px] m-auto bg-[#A8BEC2]old  bg-gray-400">
         <div id="csrf" hidden>{% csrf_token %}</div> 
 
         <div class="w-full flex items-center gap-6 pt-4 pb-4 pl-4 bg-gray-50old bg-white">
@@ -109,12 +110,12 @@
         </div>
             <div id="slide_out_menu" class="hidden">
                 <div class="grid">
-                    <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/">Calendar</a>
-                    <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/registerNew/">Register</a>
-                    <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/searchPatients/">Search</a>
+                    <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/">Oxychai's calendar</a>
+                    <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/registerNew/">Register patient</a>
+                    <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/searchPatients/">Search patients</a>
                     <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/saveLayout/">Upload layout</a>
                     <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white" href="/deleteLayout/">Delete layout</a>
-                    <a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white">SignIn</a>
+                    <!--<a class="py-[10px] pl-4 my-1 mx-1 bg-gray-50old bg-white">SignIn</a>-->
                 </div>
             </div>
 
@@ -124,6 +125,6 @@
         <div id="error_div" class="fixed top-3 mx-auto z-100 inset-x-0 w-fit hidden"><div id="error_message" class=" bg-red-300 p-5">Failed to Delete</div></div>
     </div>
     </div>  
-    <div class="w-full h-20 bg-gray-50old bg-white max-w-[404px] m-auto"></div>
+    <div class="w-full h-20 bg-gray-50old bg-white max-w-[460px] m-auto"></div>
     </body>
 </html>
