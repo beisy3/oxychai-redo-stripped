@@ -1377,7 +1377,7 @@
                             <div>Pipe Length:</div><div>${data['pipe_length']}</div>
                         </div>
                         <div class="flex justify-between">
-                            <div>Session:</div><div>${data['num_sess']}</div>
+                            <div>Session number:</div><div>${data['num_sess']}</div>
                         </div>
                         <div class="flex justify-between">
                             <div>Panel:</div><div id="panel_display">${data['position']}</div>
@@ -1493,7 +1493,7 @@
                     const info_re_status = document.createElement('div')
                     info_re_status.setAttribute('class', 'text-gray-700 text-base pl-1 pr-5 py-px')
                     info_re_status.setAttribute('id', 'info_re_status')
-                    info_re_status.innerHTML = 'The patient will only be charged if you set the status to Attended or Missed.'
+                    info_re_status.innerHTML = 'The patient will be charged once you set the appointment status to Attended or Missed. The number of sessions will also change when you set the status to attended.'
                     status_container.appendChild(status_title)
                     status_container.appendChild(change_status)
                     status_container.appendChild(info_re_status)
